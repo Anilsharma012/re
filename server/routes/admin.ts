@@ -81,18 +81,18 @@ export const verifyAdmin: RequestHandler = (req, res, next) => {
 export const getAdminStats: RequestHandler = async (req, res) => {
   try {
     const db = await getDatabase();
-    
+
     // Get stats from different collections
     const enquiriesCount = await db.collection('enquiries').countDocuments();
     const contactsCount = await db.collection('contacts').countDocuments();
-    
+
     // Get recent activity
     const recentEnquiries = await db.collection('enquiries')
       .find({})
       .sort({ createdAt: -1 })
       .limit(5)
       .toArray();
-    
+
     const recentContacts = await db.collection('contacts')
       .find({})
       .sort({ createdAt: -1 })
@@ -125,6 +125,170 @@ export const getAdminStats: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch stats'
+    });
+  }
+};
+
+// Get all contacts
+export const getContacts: RequestHandler = async (req, res) => {
+  try {
+    const db = await getDatabase();
+    const contacts = await db.collection('contacts')
+      .find({})
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    res.json({
+      success: true,
+      contacts: contacts
+    });
+  } catch (error) {
+    console.error('Error fetching contacts:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch contacts'
+    });
+  }
+};
+
+// Get all enquiries
+export const getEnquiries: RequestHandler = async (req, res) => {
+  try {
+    const db = await getDatabase();
+    const enquiries = await db.collection('enquiries')
+      .find({})
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    res.json({
+      success: true,
+      enquiries: enquiries
+    });
+  } catch (error) {
+    console.error('Error fetching enquiries:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch enquiries'
+    });
+  }
+};
+
+// Update contact status
+export const updateContactStatus: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const db = await getDatabase();
+    const result = await db.collection('contacts').updateOne(
+      { _id: id },
+      { $set: { status, updatedAt: new Date() } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Contact not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Contact status updated successfully'
+    });
+  } catch (error) {
+    console.error('Error updating contact status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update contact status'
+    });
+  }
+};
+
+// Update enquiry status
+export const updateEnquiryStatus: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const db = await getDatabase();
+    const result = await db.collection('enquiries').updateOne(
+      { _id: id },
+      { $set: { status, updatedAt: new Date() } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Enquiry not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Enquiry status updated successfully'
+    });
+  } catch (error) {
+    console.error('Error updating enquiry status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update enquiry status'
+    });
+  }
+};
+
+// Delete contact
+export const deleteContact: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const db = await getDatabase();
+
+    const result = await db.collection('contacts').deleteOne({ _id: id });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Contact not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Contact deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting contact:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete contact'
+    });
+  }
+};
+
+// Delete enquiry
+export const deleteEnquiry: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const db = await getDatabase();
+
+    const result = await db.collection('enquiries').deleteOne({ _id: id });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Enquiry not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Enquiry deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting enquiry:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete enquiry'
     });
   }
 };
