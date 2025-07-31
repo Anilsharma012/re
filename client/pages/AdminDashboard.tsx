@@ -119,7 +119,7 @@ export default function AdminDashboard() {
       console.log("🔍 Debugging authentication issues...");
       const response = await fetch("/api/admin/debug-auth", {
         headers: {
-          "Authorization": token ? `Bearer ${token}` : "",
+          Authorization: token ? `Bearer ${token}` : "",
         },
       });
 
@@ -157,7 +157,9 @@ export default function AdminDashboard() {
         // Replace the old token
         localStorage.setItem("adminToken", data.token);
 
-        alert(`✅ Authentication Fixed!\n\nA fresh token has been generated and saved.\nYou can now use admin functions normally.\n\nToken expires in: ${data.expiresIn}`);
+        alert(
+          `✅ Authentication Fixed!\n\nA fresh token has been generated and saved.\nYou can now use admin functions normally.\n\nToken expires in: ${data.expiresIn}`,
+        );
 
         // Refresh the page to apply the new token
         window.location.reload();

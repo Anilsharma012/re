@@ -100,16 +100,16 @@ export default function AdminVehicles() {
             },
           }),
           new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Request timeout')), 10000)
-          )
+            setTimeout(() => reject(new Error("Request timeout")), 10000),
+          ),
         ]);
       } catch (fetchError) {
         // If fetch fails completely, try a simpler endpoint first
-        console.log('🔧 Primary fetch failed, testing server connectivity...');
+        console.log("🔧 Primary fetch failed, testing server connectivity...");
         try {
           const pingResponse = await fetch("/api/simple-ping");
           if (pingResponse.ok) {
-            console.log('✅ Server is reachable, retrying vehicles fetch...');
+            console.log("✅ Server is reachable, retrying vehicles fetch...");
             response = await fetch("/api/vehicles", {
               method: "GET",
               headers: {
@@ -117,10 +117,10 @@ export default function AdminVehicles() {
               },
             });
           } else {
-            throw new Error('Server not responding');
+            throw new Error("Server not responding");
           }
         } catch (pingError) {
-          throw new Error('Cannot connect to server');
+          throw new Error("Cannot connect to server");
         }
       }
 
@@ -187,7 +187,7 @@ export default function AdminVehicles() {
         console.log("📱 Entering offline mode with sample vehicles...");
         const offlineVehicles = [
           {
-            _id: 'offline_1',
+            _id: "offline_1",
             name: "Sample Vehicle 1",
             type: "Sedan",
             capacity: 4,
@@ -196,10 +196,10 @@ export default function AdminVehicles() {
             description: "Sample vehicle (offline mode)",
             available: true,
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
           },
           {
-            _id: 'offline_2',
+            _id: "offline_2",
             name: "Sample Vehicle 2",
             type: "SUV",
             capacity: 7,
@@ -208,13 +208,13 @@ export default function AdminVehicles() {
             description: "Sample vehicle (offline mode)",
             available: true,
             createdAt: new Date(),
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         ];
         setVehicles(offlineVehicles);
         setMessage({
           type: "error",
-          text: "📱 Offline mode: Showing sample vehicles. Server connection failed."
+          text: "📱 Offline mode: Showing sample vehicles. Server connection failed.",
         });
       }
     } finally {
@@ -267,25 +267,27 @@ export default function AdminVehicles() {
                 ok: true,
                 status: xhr.status,
                 statusText: xhr.statusText,
-                json: () => Promise.resolve(JSON.parse(xhr.responseText))
+                json: () => Promise.resolve(JSON.parse(xhr.responseText)),
               });
             } else {
               reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
             }
           };
 
-          xhr.onerror = () => reject(new Error('Network error'));
-          xhr.ontimeout = () => reject(new Error('Request timeout'));
+          xhr.onerror = () => reject(new Error("Network error"));
+          xhr.ontimeout = () => reject(new Error("Request timeout"));
           xhr.timeout = 30000; // 30 second timeout
 
-          xhr.send(JSON.stringify({
-            ...finalFormData,
-            features: finalFormData.features || [],
-          }));
+          xhr.send(
+            JSON.stringify({
+              ...finalFormData,
+              features: finalFormData.features || [],
+            }),
+          );
         });
       } catch (xhrError) {
         // If XMLHttpRequest fails, try native fetch with additional headers
-        console.log('🔄 XMLHttpRequest failed, trying native fetch...');
+        console.log("🔄 XMLHttpRequest failed, trying native fetch...");
         response = await fetch(url, {
           method,
           headers: {
@@ -336,14 +338,20 @@ export default function AdminVehicles() {
       console.error("❌ Failed to save vehicle:", error);
 
       let errorMessage = "Failed to save vehicle";
-      if (error.message.includes("Failed to fetch") || error.message.includes("Network error")) {
-        errorMessage = "🔌 Connection issue detected. This might be caused by browser extensions or tracking scripts. Vehicle may have been saved anyway - please check the vehicle list.";
+      if (
+        error.message.includes("Failed to fetch") ||
+        error.message.includes("Network error")
+      ) {
+        errorMessage =
+          "🔌 Connection issue detected. This might be caused by browser extensions or tracking scripts. Vehicle may have been saved anyway - please check the vehicle list.";
       } else if (error.message.includes("Request timeout")) {
-        errorMessage = "⏱️ Request timeout. The server might be busy. Please try again.";
+        errorMessage =
+          "⏱️ Request timeout. The server might be busy. Please try again.";
       } else if (error.message.includes("HTTP")) {
         errorMessage = `🚫 Server error: ${error.message}`;
       } else if (error.name === "TypeError") {
-        errorMessage = "🔧 Browser compatibility issue. Try refreshing the page or using a different browser.";
+        errorMessage =
+          "🔧 Browser compatibility issue. Try refreshing the page or using a different browser.";
       } else if (error.message) {
         errorMessage = `⚠️ ${error.message}`;
       }
@@ -461,12 +469,15 @@ export default function AdminVehicles() {
 
   const retryLastSubmission = async () => {
     if (!formData.name) {
-      setMessage({ type: 'error', text: 'No form data to retry. Please fill the form again.' });
+      setMessage({
+        type: "error",
+        text: "No form data to retry. Please fill the form again.",
+      });
       return;
     }
 
-    console.log('🔄 Retrying last vehicle submission...');
-    setMessage({ type: 'success', text: '🔄 Retrying submission...' });
+    console.log("🔄 Retrying last vehicle submission...");
+    setMessage({ type: "success", text: "🔄 Retrying submission..." });
 
     // Use a simple fetch without XMLHttpRequest fallback for retry
     try {
@@ -490,7 +501,10 @@ export default function AdminVehicles() {
 
       if (response.ok) {
         const data = await response.json();
-        setMessage({ type: "success", text: "✅ Retry successful! Vehicle saved." });
+        setMessage({
+          type: "success",
+          text: "✅ Retry successful! Vehicle saved.",
+        });
         setDialogOpen(false);
         setEditingVehicle(null);
         setFormData({
@@ -513,17 +527,20 @@ export default function AdminVehicles() {
   };
 
   const forceRefresh = async () => {
-    console.log('💪 Force refreshing vehicles data...');
+    console.log("💪 Force refreshing vehicles data...");
     setLoading(true);
-    setMessage({ type: 'success', text: '🔄 Force refreshing data...' });
+    setMessage({ type: "success", text: "🔄 Force refreshing data..." });
     setVehicles([]); // Clear existing vehicles
 
     // Reset any cached state and fetch fresh data
     try {
       await fetchVehicles(0);
     } catch (error) {
-      console.error('Force refresh failed:', error);
-      setMessage({ type: 'error', text: 'Force refresh failed. Please check your connection.' });
+      console.error("Force refresh failed:", error);
+      setMessage({
+        type: "error",
+        text: "Force refresh failed. Please check your connection.",
+      });
     } finally {
       setLoading(false);
     }
@@ -643,7 +660,10 @@ Sample vehicles: ${data.storage.sampleVehicles.map((v) => v.name).join(", ")}`;
           <Button
             onClick={() => {
               setLoading(false);
-              setMessage({ type: 'error', text: 'Loading cancelled. Try using Force Refresh.' });
+              setMessage({
+                type: "error",
+                text: "Loading cancelled. Try using Force Refresh.",
+              });
             }}
             variant="outline"
             className="mt-4"
