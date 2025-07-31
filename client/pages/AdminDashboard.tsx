@@ -203,7 +203,7 @@ export default function AdminDashboard() {
         data.recentVehicles.forEach(v => {
           message += `• ${v.name} (${v.type}) - ₹${v.price}\n`;
         });
-        message += `\n✅ अब डेटा MongoDB Atlas में save हो रहा है!`;
+        message += `\n✅ अब डे���ा MongoDB Atlas में save हो रहा है!`;
         alert(message);
 
         // Refresh the page to show updated data
@@ -232,7 +232,7 @@ export default function AdminDashboard() {
         data.vehicles.slice(-3).forEach(v => {
           message += `• ${v.name} (${v.type}) - ₹${v.price}\n`;
         });
-        message += `\n�� Data is saving to MongoDB Atlas!`;
+        message += `\n✅ Data is saving to MongoDB Atlas!`;
         alert(message);
       } else {
         alert(`❌ Direct MongoDB Connection Failed:\n${data.message}\n\nError: ${data.error}`);
@@ -324,6 +324,14 @@ export default function AdminDashboard() {
           <p className="text-gray-600">Tour Website Management Panel</p>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <Button
+            onClick={testTokenVerification}
+            variant="outline"
+            className="flex items-center gap-2 border-green-600 text-green-600 hover:bg-green-50"
+          >
+            <Activity className="w-4 h-4" />
+            🔒 Test Token
+          </Button>
           <Button
             onClick={directAtlasTest}
             variant="default"
