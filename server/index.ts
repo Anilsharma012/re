@@ -19,6 +19,7 @@ import {
 import { seedTestData } from "./routes/testData";
 import { seedVehicles } from "./routes/seedVehicles";
 import { getStorageStatus, seedTestVehicles } from "./routes/debug";
+import { quickTestVehicle, getAllVehiclesTest } from "./routes/quickTest";
 import { uploadVehicleImage, getUploadedImages } from "./routes/upload";
 import { getAllVehicles, getVehicle, createVehicle, updateVehicle, deleteVehicle } from "./routes/vehicles";
 
@@ -65,6 +66,8 @@ export function createServer() {
   // Debug endpoints
   app.get("/api/debug/storage", getStorageStatus);
   app.post("/api/debug/seed-test", seedTestVehicles);
+  app.post("/api/debug/quick-test", quickTestVehicle);
+  app.get("/api/debug/vehicles", getAllVehiclesTest);
 
   // Test data seeding (for demo purposes)
   app.post("/api/admin/seed-data", verifyAdmin, seedTestData);
