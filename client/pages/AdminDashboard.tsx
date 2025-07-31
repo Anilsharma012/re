@@ -102,6 +102,34 @@ export default function AdminDashboard() {
     }
   };
 
+  const testInstantMongo = async () => {
+    try {
+      console.log('🔥 Testing instant MongoDB Atlas connection...');
+      const response = await fetch('/api/debug/mongo-instant');
+      const data = await response.json();
+
+      if (data.success) {
+        let message = `🎉 MongoDB Atlas कनेक्शन सफल!\n\n`;
+        message += `Database: ${data.connection.database}\n`;
+        message += `Total Vehicles: ${data.connection.totalVehicles}\n`;
+        message += `Test Insert ID: ${data.connection.testInsertId}\n\n`;
+        message += `Recent Vehicles:\n`;
+        data.recentVehicles.forEach(v => {
+          message += `• ${v.name} (${v.type}) - ₹${v.price}\n`;
+        });
+        message += `\n✅ अब डेटा MongoDB Atlas में save हो रहा है!`;
+        alert(message);
+
+        // Refresh the page to show updated data
+        window.location.reload();
+      } else {
+        alert(`❌ MongoDB Atlas Connection Failed:\n${data.message}\n\nError Type: ${data.errorType}`);
+      }
+    } catch (error) {
+      alert('❌ MongoDB connection test failed. Server may be offline.');
+    }
+  };
+
   const testDirectMongo = async () => {
     try {
       console.log('🚀 Testing direct MongoDB Atlas connection...');
