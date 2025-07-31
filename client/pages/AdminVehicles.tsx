@@ -557,6 +557,14 @@ Sample vehicles: ${data.storage.sampleVehicles.map((v) => v.name).join(", ")}`;
 
         <div className="flex gap-2">
           <Button
+            onClick={forceRefresh}
+            variant="default"
+            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white"
+          >
+            <Activity className="w-4 h-4" />
+            💪 Force Refresh
+          </Button>
+          <Button
             onClick={testConnection}
             variant="outline"
             className="flex items-center gap-2 border-green-600 text-green-600 hover:bg-green-50"
