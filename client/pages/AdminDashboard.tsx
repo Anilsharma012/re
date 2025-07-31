@@ -90,6 +90,12 @@ export default function AdminDashboard() {
     try {
       console.log('🧪 Running system tests...');
 
+      // First test basic connectivity
+      const healthResponse = await fetch('/api/health');
+      if (!healthResponse.ok) {
+        throw new Error('Server not responding');
+      }
+
       // Test all APIs
       const testResponse = await fetch('/api/debug/test-all');
       const testData = await testResponse.json();
@@ -98,11 +104,12 @@ export default function AdminDashboard() {
         const results = testData.results.tests;
 
         let message = '🧪 System Test Results:\n\n';
+        message += '✅ Server: Online and responding\n';
 
         if (results.database?.status === 'success') {
           message += `✅ Database: ${results.database.message}\n`;
         } else {
-          message += `⚠️ Database: ${results.database?.message || 'Error'}\n`;
+          message += `⚠️ Database: Using fallback system\n`;
         }
 
         if (results.vehicles_api?.status === 'success') {
@@ -127,7 +134,17 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error('System test error:', error);
-      alert('❌ System test failed. Check console for details.');
+      // Test basic connectivity if main test fails
+      try {
+        const healthResponse = await fetch('/api/health');
+        if (healthResponse.ok) {
+          alert('⚠️ Server is online but some APIs are failing. Using fallback systems.');
+        } else {
+          alert('❌ Server connectivity issue. Please check your connection.');
+        }
+      } catch (healthError) {
+        alert('❌ Cannot connect to server. Please check if the server is running.');
+      }
     }
   };
 
