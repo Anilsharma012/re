@@ -180,7 +180,20 @@ export default function AdminVehicles() {
         setMessage({ type: 'error', text: data.message });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to save vehicle' });
+      console.error('❌ Failed to save vehicle:', error);
+
+      let errorMessage = 'Failed to save vehicle';
+      if (error.name === 'AbortError') {
+        errorMessage = 'Request timeout - server is taking too long to respond';
+      } else if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Cannot connect to server - please check your internet connection';
+      } else if (error.message.includes('HTTP error')) {
+        errorMessage = `Server error: ${error.message}`;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      setMessage({ type: 'error', text: errorMessage });
     }
   };
 
