@@ -102,6 +102,33 @@ export default function AdminDashboard() {
     }
   };
 
+  const testTokenVerification = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        alert('❌ No token found in localStorage');
+        return;
+      }
+
+      console.log('🔒 Testing token verification...');
+      const response = await fetch('/api/admin/verify-token', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.authenticated) {
+        alert(`✅ Token Verification Successful!\n\nUser: ${data.user?.username}\nRole: ${data.user?.role}\nMessage: ${data.message}`);
+      } else {
+        alert(`❌ Token Verification Failed!\n\nMessage: ${data.message}\nAuthenticated: ${data.authenticated}`);
+      }
+    } catch (error) {
+      alert(`❌ Token Verification Error!\n\nError: ${error.message}\n\nThis might be a network connectivity issue.`);
+    }
+  };
+
   const directAtlasTest = async () => {
     try {
       console.log('🔥🔥🔥 DIRECT ATLAS TEST STARTING...');
@@ -205,7 +232,7 @@ export default function AdminDashboard() {
         data.vehicles.slice(-3).forEach(v => {
           message += `• ${v.name} (${v.type}) - ₹${v.price}\n`;
         });
-        message += `\n✅ Data is saving to MongoDB Atlas!`;
+        message += `\n�� Data is saving to MongoDB Atlas!`;
         alert(message);
       } else {
         alert(`❌ Direct MongoDB Connection Failed:\n${data.message}\n\nError: ${data.error}`);
