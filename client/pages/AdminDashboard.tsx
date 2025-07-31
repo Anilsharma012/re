@@ -412,6 +412,22 @@ export default function AdminDashboard() {
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button
+            onClick={fixAuthIssues}
+            variant="default"
+            className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-bold"
+          >
+            <Activity className="w-4 h-4" />
+            🔧 Fix Auth Issues
+          </Button>
+          <Button
+            onClick={debugAuthIssues}
+            variant="outline"
+            className="flex items-center gap-2 border-orange-600 text-orange-600 hover:bg-orange-50"
+          >
+            <Activity className="w-4 h-4" />
+            🔍 Debug Auth
+          </Button>
+          <Button
             onClick={testTokenVerification}
             variant="outline"
             className="flex items-center gap-2 border-green-600 text-green-600 hover:bg-green-50"
