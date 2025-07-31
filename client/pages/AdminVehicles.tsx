@@ -449,7 +449,7 @@ export default function AdminVehicles() {
           type: "success",
           text: "✅ Server connection successful! API is responding normally.",
         });
-        console.log("✅ Connection test passed:", data);
+        console.log("��� Connection test passed:", data);
       } else {
         setMessage({
           type: "error",
@@ -539,6 +539,19 @@ Sample vehicles: ${data.storage.sampleVehicles.map((v) => v.name).join(", ")}`;
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading vehicles...</p>
+          <p className="text-sm text-gray-500 mt-2">
+            If this takes too long, there might be a connection issue
+          </p>
+          <Button
+            onClick={() => {
+              setLoading(false);
+              setMessage({ type: 'error', text: 'Loading cancelled. Try using Force Refresh.' });
+            }}
+            variant="outline"
+            className="mt-4"
+          >
+            Cancel Loading
+          </Button>
         </div>
       </div>
     );
