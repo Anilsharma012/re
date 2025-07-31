@@ -9,16 +9,17 @@ import { Alert, AlertDescription } from '../components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Switch } from '../components/ui/switch';
-import { 
-  Car, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Users, 
+import {
+  Car,
+  Plus,
+  Edit,
+  Trash2,
+  Users,
   IndianRupee,
   Calendar,
   CheckCircle,
-  XCircle
+  XCircle,
+  Eye
 } from 'lucide-react';
 
 interface Vehicle {
