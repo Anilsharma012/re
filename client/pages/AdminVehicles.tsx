@@ -139,7 +139,7 @@ export default function AdminVehicles() {
 
       const method = editingVehicle ? 'PUT' : 'POST';
 
-      console.log('💾 Submitting vehicle data...');
+      console.log('��� Submitting vehicle data...');
 
       const response = await fetch(url, {
         method,
@@ -224,21 +224,21 @@ export default function AdminVehicles() {
     const token = localStorage.getItem('adminToken');
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      console.log('🗑️ Deleting vehicle:', vehicleId);
 
       const response = await fetch(`/api/admin/vehicles/${vehicleId}`, {
         method: 'DELETE',
-        signal: controller.signal,
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
       });
 
-      clearTimeout(timeoutId);
+      console.log('📡 Delete response status:', response.status);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`Server error ${response.status}: ${errorText || response.statusText}`);
       }
 
       const data = await response.json();
