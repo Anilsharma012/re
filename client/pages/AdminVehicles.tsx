@@ -336,18 +336,25 @@ export default function AdminVehicles() {
       console.error("❌ Failed to save vehicle:", error);
 
       let errorMessage = "Failed to save vehicle";
-      if (error.name === "AbortError") {
-        errorMessage = "Request timeout - server is taking too long to respond";
-      } else if (error.message.includes("Failed to fetch")) {
-        errorMessage =
-          "Cannot connect to server - please check your internet connection";
-      } else if (error.message.includes("HTTP error")) {
-        errorMessage = `Server error: ${error.message}`;
+      if (error.message.includes("Failed to fetch") || error.message.includes("Network error")) {
+        errorMessage = "🔌 Connection issue detected. This might be caused by browser extensions or tracking scripts. Vehicle may have been saved anyway - please check the vehicle list.";
+      } else if (error.message.includes("Request timeout")) {
+        errorMessage = "⏱️ Request timeout. The server might be busy. Please try again.";
+      } else if (error.message.includes("HTTP")) {
+        errorMessage = `🚫 Server error: ${error.message}`;
+      } else if (error.name === "TypeError") {
+        errorMessage = "🔧 Browser compatibility issue. Try refreshing the page or using a different browser.";
       } else if (error.message) {
-        errorMessage = error.message;
+        errorMessage = `⚠️ ${error.message}`;
       }
 
       setMessage({ type: "error", text: errorMessage });
+
+      // After showing error, refresh the vehicle list to check if it was actually saved
+      setTimeout(() => {
+        console.log("🔄 Checking if vehicle was saved despite the error...");
+        fetchVehicles();
+      }, 2000);
     }
   };
 
