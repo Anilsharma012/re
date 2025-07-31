@@ -73,6 +73,7 @@ export function createServer() {
   // Debug endpoints
   app.get("/api/debug/storage", getStorageStatus);
   app.get("/api/debug/mongo-test", testMongoConnection);
+  app.get("/api/debug/mongo-direct", testDirectMongo);
   app.get("/api/debug/test-all", testAllAPIs);
   app.post("/api/debug/seed-test", seedTestVehicles);
   app.post("/api/debug/quick-test", quickTestVehicle);
