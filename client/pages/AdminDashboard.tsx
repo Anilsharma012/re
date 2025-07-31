@@ -102,6 +102,36 @@ export default function AdminDashboard() {
     }
   };
 
+  const forceMongoTest = async () => {
+    try {
+      console.log('🔥🔥🔥 FORCE MongoDB Atlas connection test...');
+      const response = await fetch('/api/debug/mongo-force');
+      const data = await response.json();
+
+      if (data.success) {
+        let message = `🎉🎉🎉 MongoDB Atlas Force Test सफल!\n\n`;
+        message += `Database: ${data.database}\n`;
+        message += `Connection: ${data.connectionType}\n`;
+        message += `Total Vehicles: ${data.totalVehicles}\n`;
+        message += `Test Insert ID: ${data.testInsertId}\n\n`;
+        message += `Recent Vehicles:\n`;
+        data.recentVehicles.forEach(v => {
+          message += `• ${v.name} (${v.type}) - ₹${v.price}\n`;
+        });
+        message += `\n🎉 अब vehicle data MongoDB Atlas में save हो रहा है!`;
+        message += `\n🔄 अब admin से vehicle add करके देखें!`;
+        alert(message);
+
+        // Refresh the page to show updated data
+        window.location.reload();
+      } else {
+        alert(`❌ Force MongoDB Test Failed:\n${data.message}\n\nError: ${data.error}`);
+      }
+    } catch (error) {
+      alert('❌ Force MongoDB test failed. Server may be offline.');
+    }
+  };
+
   const testInstantMongo = async () => {
     try {
       console.log('🔥 Testing instant MongoDB Atlas connection...');
@@ -109,7 +139,7 @@ export default function AdminDashboard() {
       const data = await response.json();
 
       if (data.success) {
-        let message = `🎉 MongoDB Atlas कनेक्शन सफल!\n\n`;
+        let message = `🎉 MongoDB Atlas कनेक��शन सफल!\n\n`;
         message += `Database: ${data.connection.database}\n`;
         message += `Total Vehicles: ${data.connection.totalVehicles}\n`;
         message += `Test Insert ID: ${data.connection.testInsertId}\n\n`;
