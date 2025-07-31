@@ -414,6 +414,23 @@ export default function AdminVehicles() {
     }
   };
 
+  const forceRefresh = async () => {
+    console.log('💪 Force refreshing vehicles data...');
+    setLoading(true);
+    setMessage({ type: 'success', text: '🔄 Force refreshing data...' });
+    setVehicles([]); // Clear existing vehicles
+
+    // Reset any cached state and fetch fresh data
+    try {
+      await fetchVehicles(0);
+    } catch (error) {
+      console.error('Force refresh failed:', error);
+      setMessage({ type: 'error', text: 'Force refresh failed. Please check your connection.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const testConnection = async () => {
     try {
       console.log("🔧 Testing API connection...");
