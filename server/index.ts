@@ -56,6 +56,7 @@ export function createServer() {
   app.get("/api/test-email", handleTestEmail);
 
   // Admin routes
+  app.get("/api/admin/health", adminHealthCheck);
   app.post("/api/admin/login", adminLogin);
   app.get("/api/admin/verify-token", verifyToken);
   app.get("/api/admin/stats", verifyAdmin, getAdminStats);
