@@ -112,6 +112,63 @@ export default function AdminDashboard() {
     }
   };
 
+  const debugAuthIssues = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+
+      console.log("🔍 Debugging authentication issues...");
+      const response = await fetch("/api/admin/debug-auth", {
+        headers: {
+          "Authorization": token ? `Bearer ${token}` : "",
+        },
+      });
+
+      const data = await response.json();
+
+      let message = `🔍 Authentication Debug Report:\n\n`;
+      message += `Token Present: ${data.debug?.tokenPresent ? "✅" : "❌"}\n`;
+      message += `Token Valid: ${data.debug?.tokenValid ? "✅" : "❌"}\n`;
+
+      if (data.debug?.error) {
+        message += `Error: ${data.debug.error}\n`;
+      }
+
+      if (!data.success) {
+        message += `\n💡 To fix: Click "🔧 Fix Auth Issues" button`;
+      } else {
+        message += `\n✅ Authentication is working correctly!`;
+      }
+
+      alert(message);
+    } catch (error) {
+      alert(`❌ Debug failed: ${error.message}`);
+    }
+  };
+
+  const fixAuthIssues = async () => {
+    try {
+      console.log("🔧 Fixing authentication issues...");
+
+      // Get a fresh token
+      const response = await fetch("/api/admin/fresh-token");
+      const data = await response.json();
+
+      if (data.success) {
+        // Replace the old token
+        localStorage.setItem("adminToken", data.token);
+
+        alert(`✅ Authentication Fixed!\n\nA fresh token has been generated and saved.\nYou can now use admin functions normally.\n\nToken expires in: ${data.expiresIn}`);
+
+        // Refresh the page to apply the new token
+        window.location.reload();
+      } else {
+        alert(`❌ Failed to fix authentication: ${data.message}`);
+      }
+    } catch (error) {
+      alert(`❌ Fix failed: ${error.message}`);
+    }
+  };
+
   const testTokenVerification = async () => {
     try {
       const token = localStorage.getItem("adminToken");
@@ -283,7 +340,7 @@ export default function AdminDashboard() {
       if (testData.success) {
         const results = testData.results.tests;
 
-        let message = "🧪 System Test Results:\n\n";
+        let message = "�� System Test Results:\n\n";
         message += "✅ Server: Online and responding\n";
 
         if (results.database?.status === "success") {
