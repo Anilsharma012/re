@@ -143,20 +143,36 @@ export const getAdminStats: RequestHandler = async (req, res) => {
 export const getContacts: RequestHandler = async (req, res) => {
   try {
     const db = await getDatabase();
-    const contacts = await db.collection('contacts')
-      .find({})
-      .sort({ createdAt: -1 })
-      .toArray();
+
+    // Handle both real MongoDB and fallback database
+    let contacts;
+    try {
+      contacts = await db.collection('contacts')
+        .find({})
+        .sort({ createdAt: -1 })
+        .toArray();
+    } catch (sortError) {
+      // Fallback database doesn't support sort().toArray()
+      const findResult = await db.collection('contacts').find({});
+      contacts = Array.isArray(findResult) ? findResult : [];
+      // Sort manually if needed
+      contacts.sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0);
+        const dateB = new Date(b.createdAt || 0);
+        return dateB.getTime() - dateA.getTime();
+      });
+    }
 
     res.json({
       success: true,
-      contacts: contacts
+      contacts: contacts || []
     });
   } catch (error) {
     console.error('Error fetching contacts:', error);
-    res.status(500).json({
+    res.json({
       success: false,
-      message: 'Failed to fetch contacts'
+      message: 'Failed to fetch contacts',
+      contacts: []
     });
   }
 };
