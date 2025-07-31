@@ -71,3 +71,27 @@ export interface AdminStatsResponse {
     timestamp: Date;
   }>;
 }
+
+/**
+ * Types for vehicle management
+ */
+export interface Vehicle {
+  _id?: string;
+  name: string;
+  type: string;
+  capacity: number;
+  price: number;
+  features: string[];
+  image?: string;
+  description?: string;
+  available: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface VehicleResponse {
+  success: boolean;
+  message: string;
+  vehicle?: Vehicle;
+  vehicles?: Vehicle[];
+}
