@@ -101,12 +101,14 @@ export default function AdminVehicles() {
 
       // Provide user-friendly error message
       let errorMessage = 'Failed to load vehicles';
-      if (error.name === 'AbortError') {
-        errorMessage = 'Request timeout - server is taking too long to respond';
-      } else if (error.message.includes('Failed to fetch')) {
-        errorMessage = 'Cannot connect to server - please check your internet connection';
-      } else if (error.message.includes('HTTP error')) {
-        errorMessage = `Server error: ${error.message}`;
+      if (error.message.includes('Failed to fetch')) {
+        errorMessage = '🔌 Cannot connect to server. Please check your internet connection and try again.';
+      } else if (error.message.includes('Server returned') || error.message.includes('Server error')) {
+        errorMessage = `🚫 ${error.message}`;
+      } else if (error.name === 'TypeError') {
+        errorMessage = '🔌 Network connection issue. Please try again.';
+      } else if (error.message) {
+        errorMessage = `⚠️ ${error.message}`;
       }
 
       setMessage({ type: 'error', text: errorMessage });
@@ -139,7 +141,7 @@ export default function AdminVehicles() {
 
       const method = editingVehicle ? 'PUT' : 'POST';
 
-      console.log('��� Submitting vehicle data...');
+      console.log('💾 Submitting vehicle data...');
 
       const response = await fetch(url, {
         method,
