@@ -5,7 +5,17 @@ import { handleDemo } from "./routes/demo";
 import { handleEnquiry } from "./routes/enquiry";
 import { handleContact } from "./routes/contact";
 import { handleTestEmail } from "./routes/testEmail";
-import { adminLogin, verifyAdmin, getAdminStats } from "./routes/admin";
+import {
+  adminLogin,
+  verifyAdmin,
+  getAdminStats,
+  getContacts,
+  getEnquiries,
+  updateContactStatus,
+  updateEnquiryStatus,
+  deleteContact,
+  deleteEnquiry
+} from "./routes/admin";
 import { getAllVehicles, getVehicle, createVehicle, updateVehicle, deleteVehicle } from "./routes/vehicles";
 
 export function createServer() {
@@ -30,6 +40,12 @@ export function createServer() {
   // Admin routes
   app.post("/api/admin/login", adminLogin);
   app.get("/api/admin/stats", verifyAdmin, getAdminStats);
+  app.get("/api/admin/contacts", verifyAdmin, getContacts);
+  app.get("/api/admin/enquiries", verifyAdmin, getEnquiries);
+  app.put("/api/admin/contacts/:id/status", verifyAdmin, updateContactStatus);
+  app.put("/api/admin/enquiries/:id/status", verifyAdmin, updateEnquiryStatus);
+  app.delete("/api/admin/contacts/:id", verifyAdmin, deleteContact);
+  app.delete("/api/admin/enquiries/:id", verifyAdmin, deleteEnquiry);
 
   // Vehicle routes
   app.get("/api/vehicles", getAllVehicles);
