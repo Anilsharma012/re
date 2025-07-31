@@ -6,53 +6,48 @@ export const testMongoConnection: RequestHandler = async (req, res) => {
     console.log('🧪 Testing MongoDB Atlas connection...');
     const db = await getDatabase();
     
-    // Test basic database operations
-    console.log('✅ Database connection successful');
+    // Test collection operations
+    const vehicles = await db.collection('vehicles').find({}).toArray();
+    const enquiries = await db.collection('enquiries').find({}).toArray();
+    const contacts = await db.collection('contacts').find({}).toArray();
     
     // Test inserting a test document
     const testDoc = {
       test: true,
-      message: "Connection test successful",
+      timestamp: new Date(),
+      message: "MongoDB Atlas connection test"
+    };
+    
+    const insertResult = await db.collection('connection_tests').insertOne(testDoc);
+    console.log('✅ Test document inserted with ID:', insertResult.insertedId);
+    
+    // Test deleting the test document
+    await db.collection('connection_tests').deleteOne({ _id: insertResult.insertedId });
+    console.log('✅ Test document deleted successfully');
+    
+    const result = {
+      success: true,
+      message: 'MongoDB Atlas connection successful',
+      database: 'tours',
+      collections: {
+        vehicles: vehicles.length,
+        enquiries: enquiries.length,
+        contacts: contacts.length
+      },
+      testInsertId: insertResult.insertedId.toString(),
       timestamp: new Date()
     };
     
-    const insertResult = await db.collection('connection_test').insertOne(testDoc);
-    console.log('✅ Insert test successful:', insertResult.insertedId);
+    console.log('✅ MongoDB Atlas test completed:', result);
+    res.json(result);
     
-    // Test reading the document back
-    const readResult = await db.collection('connection_test').findOne({ _id: insertResult.insertedId });
-    console.log('✅ Read test successful');
-    
-    // Clean up test document
-    await db.collection('connection_test').deleteOne({ _id: insertResult.insertedId });
-    console.log('✅ Delete test successful');
-    
-    // Get collection stats
-    const vehiclesCount = await db.collection('vehicles').countDocuments();
-    const enquiriesCount = await db.collection('enquiries').countDocuments();
-    const contactsCount = await db.collection('contacts').countDocuments();
-    
-    res.json({
-      success: true,
-      message: '🎉 MongoDB Atlas connection working perfectly!',
-      details: {
-        connection: 'Connected successfully',
-        database: 'tour_admin',
-        operations: 'Insert, Read, Delete all working',
-        collections: {
-          vehicles: vehiclesCount,
-          enquiries: enquiriesCount,
-          contacts: contactsCount
-        }
-      }
-    });
   } catch (error) {
-    console.error('❌ MongoDB connection test failed:', error);
+    console.error('❌ MongoDB Atlas test failed:', error.message);
     res.status(500).json({
       success: false,
       message: 'MongoDB Atlas connection failed',
       error: error.message,
-      details: 'Please check your connection string and password'
+      timestamp: new Date()
     });
   }
 };
