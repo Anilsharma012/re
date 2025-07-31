@@ -4,8 +4,8 @@ let client: MongoClient | null = null;
 let db: Db | null = null;
 
 const MONGODB_PASSWORD = process.env.MONGODB_PASSWORD || 'Anilsharma123';
-const MONGODB_URI = process.env.MONGODB_URI || `mongodb+srv://Tour:${MONGODB_PASSWORD}@cluster0.mfp2blo.mongodb.net/?retryWrites=true&w=majority&ssl=true`;
-const DB_NAME = 'tour_admin';
+const MONGODB_URI = process.env.MONGODB_URI || `mongodb+srv://Tour:${MONGODB_PASSWORD}@cluster0.mfp2blo.mongodb.net/tours?retryWrites=true&w=majority`;
+const DB_NAME = 'tours';
 
 // Fallback database system when MongoDB Atlas is unavailable
 let fallbackStorage = {
@@ -128,13 +128,10 @@ export async function connectToDatabase(): Promise<Db> {
 
     client = new MongoClient(MONGODB_URI, {
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 8000,
+      serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 30000,
-      connectTimeoutMS: 8000,
-      retryWrites: true,
-      ssl: true,
-      tlsAllowInvalidCertificates: false,
-      tlsAllowInvalidHostnames: false
+      connectTimeoutMS: 10000,
+      retryWrites: true
     });
 
     await client.connect();
