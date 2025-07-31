@@ -60,12 +60,10 @@ export default function AdminVehicles() {
     fetchVehicles();
   }, []);
 
-  const fetchVehicles = async () => {
-    console.log('🚗 Fetching vehicles for admin panel...');
+  const fetchVehicles = async (retryCount = 0) => {
+    console.log(`🚗 Fetching vehicles for admin panel... (attempt ${retryCount + 1})`);
 
     try {
-      console.log('🚗 Fetching vehicles from API...');
-
       const response = await fetch('/api/vehicles', {
         method: 'GET',
         headers: {
