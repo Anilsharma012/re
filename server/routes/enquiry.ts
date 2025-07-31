@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { EnquiryFormData, EnquiryResponse } from "@shared/api";
 import { sendEmail } from "../services/emailService";
+import { getDatabase } from "../services/database";
 
 export const handleEnquiry: RequestHandler = async (req, res) => {
   try {
@@ -69,6 +70,21 @@ Please contact the customer at ${formData.mobile} to provide a quote.
     // - SendGrid
     // - Amazon SES
     // - etc.
+
+    // Save to MongoDB
+    try {
+      const db = await getDatabase();
+      const enquiryWithTimestamp = {
+        ...formData,
+        createdAt: new Date(),
+        status: 'new'
+      };
+      await db.collection('enquiries').insertOne(enquiryWithTimestamp);
+      console.log('✅ Enquiry saved to database');
+    } catch (dbError) {
+      console.error('⚠️ Failed to save to database:', dbError);
+      // Continue with email sending even if DB save fails
+    }
 
     // Send email using email service
     console.log("📧 New Enquiry Received:");
