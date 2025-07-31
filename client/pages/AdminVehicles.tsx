@@ -459,6 +459,59 @@ export default function AdminVehicles() {
     }
   };
 
+  const retryLastSubmission = async () => {
+    if (!formData.name) {
+      setMessage({ type: 'error', text: 'No form data to retry. Please fill the form again.' });
+      return;
+    }
+
+    console.log('🔄 Retrying last vehicle submission...');
+    setMessage({ type: 'success', text: '🔄 Retrying submission...' });
+
+    // Use a simple fetch without XMLHttpRequest fallback for retry
+    try {
+      const token = localStorage.getItem("adminToken");
+      const url = editingVehicle
+        ? `/api/admin/vehicles/${editingVehicle._id}`
+        : "/api/admin/vehicles";
+      const method = editingVehicle ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...formData,
+          features: formData.features || [],
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMessage({ type: "success", text: "✅ Retry successful! Vehicle saved." });
+        setDialogOpen(false);
+        setEditingVehicle(null);
+        setFormData({
+          name: "",
+          type: "",
+          capacity: 0,
+          price: 0,
+          features: [],
+          description: "",
+          available: true,
+          image: "",
+        });
+        fetchVehicles();
+      } else {
+        setMessage({ type: "error", text: `Retry failed: ${response.status}` });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: `Retry failed: ${error.message}` });
+    }
+  };
+
   const forceRefresh = async () => {
     console.log('💪 Force refreshing vehicles data...');
     setLoading(true);
