@@ -5,6 +5,7 @@ import { handleDemo } from "./routes/demo";
 import { handleEnquiry } from "./routes/enquiry";
 import { handleContact } from "./routes/contact";
 import { handleTestEmail } from "./routes/testEmail";
+import { adminLogin, verifyAdmin, getAdminStats } from "./routes/admin";
 
 export function createServer() {
   const app = express();
@@ -24,6 +25,10 @@ export function createServer() {
   app.post("/api/enquiry", handleEnquiry);
   app.post("/api/contact", handleContact);
   app.get("/api/test-email", handleTestEmail);
+
+  // Admin routes
+  app.post("/api/admin/login", adminLogin);
+  app.get("/api/admin/stats", verifyAdmin, getAdminStats);
 
   return app;
 }
