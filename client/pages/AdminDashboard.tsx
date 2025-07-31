@@ -139,7 +139,7 @@ export default function AdminDashboard() {
       const data = await response.json();
 
       if (data.success) {
-        let message = `🎉 MongoDB Atlas कनेक��शन सफल!\n\n`;
+        let message = `🎉 MongoDB Atlas कनेक्शन सफल!\n\n`;
         message += `Database: ${data.connection.database}\n`;
         message += `Total Vehicles: ${data.connection.totalVehicles}\n`;
         message += `Test Insert ID: ${data.connection.testInsertId}\n\n`;
@@ -269,9 +269,17 @@ export default function AdminDashboard() {
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button
+            onClick={forceMongoTest}
+            variant="default"
+            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold"
+          >
+            <BarChart3 className="w-4 h-4" />
+            🔥🔥🔥 FORCE FIX
+          </Button>
+          <Button
             onClick={testInstantMongo}
             variant="default"
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white"
+            className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white"
           >
             <BarChart3 className="w-4 h-4" />
             🔥 Fix MongoDB
