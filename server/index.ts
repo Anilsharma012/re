@@ -46,10 +46,8 @@ export function createServer() {
   app.get("/api/health", healthCheck);
 
   // Example API routes
-  app.get("/api/ping", (_req, res) => {
-    const ping = process.env.PING_MESSAGE ?? "ping";
-    res.json({ message: ping });
-  });
+  app.get("/api/ping", simplePing);
+  app.get("/api/simple-ping", simplePing);
 
   app.get("/api/demo", handleDemo);
   app.post("/api/enquiry", handleEnquiry);
