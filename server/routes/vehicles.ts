@@ -83,20 +83,26 @@ export const getVehicle: RequestHandler = async (req, res) => {
 // Create new vehicle
 export const createVehicle: RequestHandler = async (req, res) => {
   try {
+    console.log('🚗 Creating new vehicle...');
+    console.log('📝 Vehicle data received:', req.body);
+
     const vehicleData: Omit<Vehicle, '_id' | 'createdAt' | 'updatedAt'> = req.body;
-    
+
     // Validate required fields
     const requiredFields = ['name', 'type', 'capacity', 'price'];
     const missingFields = requiredFields.filter(field => !vehicleData[field as keyof typeof vehicleData]);
-    
+
     if (missingFields.length > 0) {
+      console.log('❌ Missing fields:', missingFields);
       return res.status(400).json({
         success: false,
         message: `Missing required fields: ${missingFields.join(', ')}`
       });
     }
-    
+
+    console.log('💾 Getting database connection...');
     const db = await getDatabase();
+
     const vehicle = {
       ...vehicleData,
       available: vehicleData.available ?? true,
@@ -104,21 +110,29 @@ export const createVehicle: RequestHandler = async (req, res) => {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
+    console.log('🔄 Inserting vehicle into MongoDB Atlas...');
     const result = await db.collection('vehicles').insertOne(vehicle);
-    
+    console.log('✅ Vehicle inserted with ID:', result.insertedId);
+
+    // Verify the vehicle was actually inserted
+    const insertedVehicle = await db.collection('vehicles').findOne({ _id: result.insertedId });
+    console.log('🔍 Verification - Vehicle found in DB:', !!insertedVehicle);
+
     const response: VehicleResponse = {
       success: true,
-      message: 'Vehicle created successfully',
+      message: 'Vehicle created successfully and saved to MongoDB Atlas',
       vehicle: { ...vehicle, _id: result.insertedId.toString() }
     };
-    
+
+    console.log('🎉 Vehicle creation completed successfully!');
     res.status(201).json(response);
   } catch (error) {
-    console.error('Error creating vehicle:', error);
+    console.error('❌ Error creating vehicle:', error.message);
+    console.error('❌ Full error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create vehicle'
+      message: `Failed to create vehicle: ${error.message}`
     });
   }
 };
