@@ -183,14 +183,24 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
           <p className="text-gray-600">Tour Website Management Panel</p>
         </div>
-        <Button
-          onClick={quickTestSystem}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          <Activity className="w-4 h-4" />
-          Test All Systems
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={testMongoConnection}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <BarChart3 className="w-4 h-4" />
+            Test MongoDB
+          </Button>
+          <Button
+            onClick={quickTestSystem}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Activity className="w-4 h-4" />
+            Test All Systems
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
