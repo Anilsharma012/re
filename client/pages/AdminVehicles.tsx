@@ -86,7 +86,12 @@ export default function AdminVehicles() {
 
       if (data.success) {
         setVehicles(data.vehicles || []);
-        setMessage({ type: 'success', text: `Loaded ${data.vehicles?.length || 0} vehicles successfully` });
+        setMessage({ type: 'success', text: `✅ Successfully loaded ${data.vehicles?.length || 0} vehicles from database` });
+
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          setMessage(null);
+        }, 3000);
       } else {
         console.warn('⚠️ Vehicles fetch unsuccessful:', data.message);
         setVehicles([]);
