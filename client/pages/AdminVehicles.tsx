@@ -203,6 +203,28 @@ export default function AdminVehicles() {
     }
   };
 
+  const testStorage = async () => {
+    try {
+      const response = await fetch('/api/debug/storage');
+      const data = await response.json();
+
+      if (data.success) {
+        const storageInfo = `Storage: ${data.storage.type}
+Vehicles: ${data.storage.collections.vehicles}
+Enquiries: ${data.storage.collections.enquiries}
+Contacts: ${data.storage.collections.contacts}
+
+Sample vehicles: ${data.storage.sampleVehicles.map(v => v.name).join(', ')}`;
+
+        alert(storageInfo);
+      } else {
+        setMessage({ type: 'error', text: 'Failed to check storage' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to check storage status' });
+    }
+  };
+
   const handleFeaturesChange = (value: string) => {
     const features = value.split(',').map(f => f.trim()).filter(f => f);
     setFormData({ ...formData, features });
@@ -267,6 +289,15 @@ export default function AdminVehicles() {
         </div>
         
         <div className="flex gap-2">
+          <Button
+            onClick={testStorage}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Eye className="w-4 h-4" />
+            Check Storage
+          </Button>
+
           <Button
             onClick={seedVehicles}
             variant="outline"
