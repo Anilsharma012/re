@@ -46,3 +46,28 @@ export interface ContactResponse {
   success: boolean;
   message: string;
 }
+
+/**
+ * Types for admin authentication and dashboard
+ */
+export interface AdminLoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface AdminLoginResponse {
+  success: boolean;
+  token?: string;
+  message: string;
+}
+
+export interface AdminStatsResponse {
+  totalVisitors: number;
+  totalEnquiries: number;
+  totalContacts: number;
+  recentActivity: Array<{
+    type: string;
+    message: string;
+    timestamp: Date;
+  }>;
+}
