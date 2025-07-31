@@ -43,12 +43,12 @@ Please respond to the customer at ${formData.email} or ${formData.phone}.
       const contactWithTimestamp = {
         ...formData,
         createdAt: new Date(),
-        status: 'new'
+        status: "new",
       };
-      await db.collection('contacts').insertOne(contactWithTimestamp);
-      console.log('✅ Contact message saved to database');
+      await db.collection("contacts").insertOne(contactWithTimestamp);
+      console.log("✅ Contact message saved to database");
     } catch (dbError) {
-      console.error('⚠️ Failed to save to database:', dbError);
+      console.error("⚠️ Failed to save to database:", dbError);
       // Continue with email sending even if DB save fails
     }
 

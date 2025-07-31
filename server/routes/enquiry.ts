@@ -77,12 +77,12 @@ Please contact the customer at ${formData.mobile} to provide a quote.
       const enquiryWithTimestamp = {
         ...formData,
         createdAt: new Date(),
-        status: 'new'
+        status: "new",
       };
-      await db.collection('enquiries').insertOne(enquiryWithTimestamp);
-      console.log('✅ Enquiry saved to database');
+      await db.collection("enquiries").insertOne(enquiryWithTimestamp);
+      console.log("✅ Enquiry saved to database");
     } catch (dbError) {
-      console.error('⚠️ Failed to save to database:', dbError);
+      console.error("⚠️ Failed to save to database:", dbError);
       // Continue with email sending even if DB save fails
     }
 

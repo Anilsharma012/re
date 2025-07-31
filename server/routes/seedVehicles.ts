@@ -4,10 +4,10 @@ import { getDatabase } from "../services/database";
 export const seedVehicles: RequestHandler = async (req, res) => {
   try {
     const db = await getDatabase();
-    
+
     // Clear existing vehicles
-    await db.collection('vehicles').deleteMany({});
-    
+    await db.collection("vehicles").deleteMany({});
+
     // Sample vehicles with images
     const sampleVehicles = [
       {
@@ -20,11 +20,11 @@ export const seedVehicles: RequestHandler = async (req, res) => {
         available: true,
         image: "./image/maruti.webp",
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
         name: "Hyundai Verna",
-        type: "Sedan", 
+        type: "Sedan",
         capacity: 4,
         price: 3000,
         features: ["AC", "Premium Interior", "GPS", "Bluetooth"],
@@ -32,10 +32,10 @@ export const seedVehicles: RequestHandler = async (req, res) => {
         available: true,
         image: "./image/v.jpg",
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
-        name: "Toyota Innova Crysta", 
+        name: "Toyota Innova Crysta",
         type: "SUV",
         capacity: 7,
         price: 4000,
@@ -44,7 +44,7 @@ export const seedVehicles: RequestHandler = async (req, res) => {
         available: true,
         image: "./image/c.avif",
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
         name: "Mahindra Scorpio",
@@ -56,19 +56,25 @@ export const seedVehicles: RequestHandler = async (req, res) => {
         available: true,
         image: "./image/s.jpg",
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
         name: "Force Urbania",
-        type: "Tempo Traveller", 
+        type: "Tempo Traveller",
         capacity: 12,
         price: 6500,
-        features: ["AC", "Reclining Seats", "GPS", "Entertainment", "Luggage Space"],
+        features: [
+          "AC",
+          "Reclining Seats",
+          "GPS",
+          "Entertainment",
+          "Luggage Space",
+        ],
         description: "Perfect for group tours and pilgrimages",
         available: true,
         image: "./image/t.jpg",
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
         name: "Tempo Traveller 17 Seater",
@@ -80,7 +86,7 @@ export const seedVehicles: RequestHandler = async (req, res) => {
         available: true,
         image: "./image/tt.jpg",
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
         name: "Mini Bus 25 Seater",
@@ -92,7 +98,7 @@ export const seedVehicles: RequestHandler = async (req, res) => {
         available: true,
         image: "./image/mm.jpeg",
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
         name: "Mini Bus 32 Seater",
@@ -104,24 +110,23 @@ export const seedVehicles: RequestHandler = async (req, res) => {
         available: true,
         image: "./image/mmm.jpg",
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     ];
 
     // Insert vehicles
-    const result = await db.collection('vehicles').insertMany(sampleVehicles);
+    const result = await db.collection("vehicles").insertMany(sampleVehicles);
 
     res.json({
       success: true,
       message: `Successfully seeded ${result.insertedCount} vehicles`,
-      vehicles: sampleVehicles.length
+      vehicles: sampleVehicles.length,
     });
-
   } catch (error) {
-    console.error('Error seeding vehicles:', error);
+    console.error("Error seeding vehicles:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to seed vehicles'
+      message: "Failed to seed vehicles",
     });
   }
 };

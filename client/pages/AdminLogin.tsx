@@ -1,29 +1,35 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Label } from '../components/ui/label';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import { Lock, User } from 'lucide-react';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Label } from "../components/ui/label";
+import { Alert, AlertDescription } from "../components/ui/alert";
+import { Lock, User } from "lucide-react";
 
 export default function AdminLogin() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('/api/admin/login', {
-        method: 'POST',
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
       });
@@ -31,13 +37,13 @@ export default function AdminLogin() {
       const data = await response.json();
 
       if (data.success) {
-        localStorage.setItem('adminToken', data.token);
-        navigate('/admin/dashboard');
+        localStorage.setItem("adminToken", data.token);
+        navigate("/admin/dashboard");
       } else {
-        setError(data.message || 'Login failed');
+        setError(data.message || "Login failed");
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      setError("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -89,7 +95,7 @@ export default function AdminLogin() {
                 />
               </div>
             </div>
-            
+
             {error && (
               <Alert className="border-red-200 bg-red-50">
                 <AlertDescription className="text-red-700">
@@ -98,19 +104,17 @@ export default function AdminLogin() {
               </Alert>
             )}
 
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={loading}
-            >
-              {loading ? 'Signing in...' : 'Sign In'}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600 text-center">
-              <strong>Demo Credentials:</strong><br />
-              Username: Admin<br />
+              <strong>Demo Credentials:</strong>
+              <br />
+              Username: Admin
+              <br />
               Password: admin123
             </p>
           </div>

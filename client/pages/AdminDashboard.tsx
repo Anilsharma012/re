@@ -1,18 +1,24 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { 
-  Users, 
-  MessageSquare, 
-  Phone, 
-  BarChart3, 
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import {
+  Users,
+  MessageSquare,
+  Phone,
+  BarChart3,
   Activity,
   TrendingUp,
   Eye,
-  Car
-} from 'lucide-react';
+  Car,
+} from "lucide-react";
 
 interface AdminStats {
   totalVisitors: number;
@@ -36,41 +42,41 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem("adminToken");
       if (!token) {
-        navigate('/admin/login');
+        navigate("/admin/login");
         return;
       }
 
-      console.log('📊 Fetching dashboard stats...');
-      const response = await fetch('/api/admin/stats', {
+      console.log("📊 Fetching dashboard stats...");
+      const response = await fetch("/api/admin/stats", {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ Stats fetched successfully');
+        console.log("✅ Stats fetched successfully");
         setStats(data);
       } else {
-        console.log('❌ Stats fetch failed, status:', response.status);
+        console.log("❌ Stats fetch failed, status:", response.status);
         // Set fallback stats instead of logging out
         setStats({
           totalVisitors: 1250,
           totalEnquiries: 0,
           totalContacts: 0,
-          recentActivity: []
+          recentActivity: [],
         });
       }
     } catch (error) {
-      console.error('❌ Failed to fetch stats:', error.message);
+      console.error("❌ Failed to fetch stats:", error.message);
       // Set fallback stats when API is unavailable
       setStats({
         totalVisitors: 1250,
         totalEnquiries: 0,
         totalContacts: 0,
-        recentActivity: []
+        recentActivity: [],
       });
     } finally {
       setLoading(false);
@@ -78,61 +84,71 @@ export default function AdminDashboard() {
   };
 
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const testMongoConnection = async () => {
     try {
-      console.log('🧪 Testing MongoDB Atlas connection...');
-      const response = await fetch('/api/debug/mongo-test');
+      console.log("🧪 Testing MongoDB Atlas connection...");
+      const response = await fetch("/api/debug/mongo-test");
       const data = await response.json();
 
       if (data.success) {
-        alert(`✅ MongoDB Atlas Connected Successfully!\n\nDatabase: ${data.database}\nVehicles: ${data.collections.vehicles}\nEnquiries: ${data.collections.enquiries}\nContacts: ${data.collections.contacts}\n\nData will now save to MongoDB Atlas!`);
+        alert(
+          `✅ MongoDB Atlas Connected Successfully!\n\nDatabase: ${data.database}\nVehicles: ${data.collections.vehicles}\nEnquiries: ${data.collections.enquiries}\nContacts: ${data.collections.contacts}\n\nData will now save to MongoDB Atlas!`,
+        );
       } else {
-        alert(`❌ MongoDB Atlas Connection Failed:\n${data.message}\n\nUsing fallback storage instead.`);
+        alert(
+          `❌ MongoDB Atlas Connection Failed:\n${data.message}\n\nUsing fallback storage instead.`,
+        );
       }
     } catch (error) {
-      alert('❌ Cannot test MongoDB connection. Server may be offline.');
+      alert("❌ Cannot test MongoDB connection. Server may be offline.");
     }
   };
 
   const testTokenVerification = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem("adminToken");
       if (!token) {
-        alert('❌ No token found in localStorage');
+        alert("❌ No token found in localStorage");
         return;
       }
 
-      console.log('🔒 Testing token verification...');
-      const response = await fetch('/api/admin/verify-token', {
+      console.log("🔒 Testing token verification...");
+      const response = await fetch("/api/admin/verify-token", {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       const data = await response.json();
 
       if (data.success && data.authenticated) {
-        alert(`✅ Token Verification Successful!\n\nUser: ${data.user?.username}\nRole: ${data.user?.role}\nMessage: ${data.message}`);
+        alert(
+          `✅ Token Verification Successful!\n\nUser: ${data.user?.username}\nRole: ${data.user?.role}\nMessage: ${data.message}`,
+        );
       } else {
-        alert(`❌ Token Verification Failed!\n\nMessage: ${data.message}\nAuthenticated: ${data.authenticated}`);
+        alert(
+          `❌ Token Verification Failed!\n\nMessage: ${data.message}\nAuthenticated: ${data.authenticated}`,
+        );
       }
     } catch (error) {
-      alert(`❌ Token Verification Error!\n\nError: ${error.message}\n\nThis might be a network connectivity issue.`);
+      alert(
+        `❌ Token Verification Error!\n\nError: ${error.message}\n\nThis might be a network connectivity issue.`,
+      );
     }
   };
 
   const directAtlasTest = async () => {
     try {
-      console.log('🔥🔥🔥 DIRECT ATLAS TEST STARTING...');
-      const response = await fetch('/api/debug/direct-atlas');
+      console.log("🔥🔥🔥 DIRECT ATLAS TEST STARTING...");
+      const response = await fetch("/api/debug/direct-atlas");
       const data = await response.json();
 
       if (data.success) {
@@ -141,7 +157,7 @@ export default function AdminDashboard() {
         message += `Total Vehicles: ${data.totalVehicles}\n`;
         message += `Test Insert ID: ${data.insertedId}\n\n`;
         message += `All Vehicles in MongoDB Atlas:\n`;
-        data.allVehicles.forEach(v => {
+        data.allVehicles.forEach((v) => {
           message += `• ${v.name} (${v.type}) - ₹${v.price}\n`;
         });
         message += `\n✅ अब आप MongoDB Atlas में अपना data देख सकते हैं!`;
@@ -151,17 +167,19 @@ export default function AdminDashboard() {
         // Refresh the page to show updated data
         window.location.reload();
       } else {
-        alert(`❌ Direct Atlas Test Failed:\n${data.message}\n\nError: ${data.error}`);
+        alert(
+          `❌ Direct Atlas Test Failed:\n${data.message}\n\nError: ${data.error}`,
+        );
       }
     } catch (error) {
-      alert('❌ Direct Atlas test failed. Server may be offline.');
+      alert("❌ Direct Atlas test failed. Server may be offline.");
     }
   };
 
   const forceMongoTest = async () => {
     try {
-      console.log('🔥🔥🔥 FORCE MongoDB Atlas connection test...');
-      const response = await fetch('/api/debug/mongo-force');
+      console.log("🔥🔥🔥 FORCE MongoDB Atlas connection test...");
+      const response = await fetch("/api/debug/mongo-force");
       const data = await response.json();
 
       if (data.success) {
@@ -171,7 +189,7 @@ export default function AdminDashboard() {
         message += `Total Vehicles: ${data.totalVehicles}\n`;
         message += `Test Insert ID: ${data.testInsertId}\n\n`;
         message += `Recent Vehicles:\n`;
-        data.recentVehicles.forEach(v => {
+        data.recentVehicles.forEach((v) => {
           message += `• ${v.name} (${v.type}) - ₹${v.price}\n`;
         });
         message += `\n🎉 अब vehicle data MongoDB Atlas में save हो रहा है!`;
@@ -181,17 +199,19 @@ export default function AdminDashboard() {
         // Refresh the page to show updated data
         window.location.reload();
       } else {
-        alert(`❌ Force MongoDB Test Failed:\n${data.message}\n\nError: ${data.error}`);
+        alert(
+          `❌ Force MongoDB Test Failed:\n${data.message}\n\nError: ${data.error}`,
+        );
       }
     } catch (error) {
-      alert('❌ Force MongoDB test failed. Server may be offline.');
+      alert("❌ Force MongoDB test failed. Server may be offline.");
     }
   };
 
   const testInstantMongo = async () => {
     try {
-      console.log('🔥 Testing instant MongoDB Atlas connection...');
-      const response = await fetch('/api/debug/mongo-instant');
+      console.log("🔥 Testing instant MongoDB Atlas connection...");
+      const response = await fetch("/api/debug/mongo-instant");
       const data = await response.json();
 
       if (data.success) {
@@ -200,7 +220,7 @@ export default function AdminDashboard() {
         message += `Total Vehicles: ${data.connection.totalVehicles}\n`;
         message += `Test Insert ID: ${data.connection.testInsertId}\n\n`;
         message += `Recent Vehicles:\n`;
-        data.recentVehicles.forEach(v => {
+        data.recentVehicles.forEach((v) => {
           message += `• ${v.name} (${v.type}) - ₹${v.price}\n`;
         });
         message += `\n✅ अब डे���ा MongoDB Atlas में save हो रहा है!`;
@@ -209,97 +229,105 @@ export default function AdminDashboard() {
         // Refresh the page to show updated data
         window.location.reload();
       } else {
-        alert(`❌ MongoDB Atlas Connection Failed:\n${data.message}\n\nError Type: ${data.errorType}`);
+        alert(
+          `❌ MongoDB Atlas Connection Failed:\n${data.message}\n\nError Type: ${data.errorType}`,
+        );
       }
     } catch (error) {
-      alert('❌ MongoDB connection test failed. Server may be offline.');
+      alert("❌ MongoDB connection test failed. Server may be offline.");
     }
   };
 
   const testDirectMongo = async () => {
     try {
-      console.log('🚀 Testing direct MongoDB Atlas connection...');
-      const response = await fetch('/api/debug/mongo-direct');
+      console.log("🚀 Testing direct MongoDB Atlas connection...");
+      const response = await fetch("/api/debug/mongo-direct");
       const data = await response.json();
 
       if (data.success) {
         let message = `🎉 MongoDB Atlas Connected Successfully!\n\n`;
         message += `Database: ${data.database}\n`;
-        message += `Collections: ${data.collections.join(', ')}\n`;
+        message += `Collections: ${data.collections.join(", ")}\n`;
         message += `Total Vehicles: ${data.vehicleCount}\n`;
         message += `Test Vehicle ID: ${data.testInsertId}\n\n`;
         message += `Recent Vehicles:\n`;
-        data.vehicles.slice(-3).forEach(v => {
+        data.vehicles.slice(-3).forEach((v) => {
           message += `• ${v.name} (${v.type}) - ₹${v.price}\n`;
         });
         message += `\n✅ Data is saving to MongoDB Atlas!`;
         alert(message);
       } else {
-        alert(`❌ Direct MongoDB Connection Failed:\n${data.message}\n\nError: ${data.error}`);
+        alert(
+          `❌ Direct MongoDB Connection Failed:\n${data.message}\n\nError: ${data.error}`,
+        );
       }
     } catch (error) {
-      alert('❌ Cannot test direct MongoDB connection. Server may be offline.');
+      alert("❌ Cannot test direct MongoDB connection. Server may be offline.");
     }
   };
 
   const quickTestSystem = async () => {
     try {
-      console.log('🧪 Running system tests...');
+      console.log("🧪 Running system tests...");
 
       // First test basic connectivity
-      const healthResponse = await fetch('/api/health');
+      const healthResponse = await fetch("/api/health");
       if (!healthResponse.ok) {
-        throw new Error('Server not responding');
+        throw new Error("Server not responding");
       }
 
       // Test all APIs
-      const testResponse = await fetch('/api/debug/test-all');
+      const testResponse = await fetch("/api/debug/test-all");
       const testData = await testResponse.json();
 
       if (testData.success) {
         const results = testData.results.tests;
 
-        let message = '🧪 System Test Results:\n\n';
-        message += '✅ Server: Online and responding\n';
+        let message = "🧪 System Test Results:\n\n";
+        message += "✅ Server: Online and responding\n";
 
-        if (results.database?.status === 'success') {
+        if (results.database?.status === "success") {
           message += `✅ Database: ${results.database.message}\n`;
         } else {
           message += `⚠️ Database: Using fallback system\n`;
         }
 
-        if (results.vehicles_api?.status === 'success') {
+        if (results.vehicles_api?.status === "success") {
           message += `✅ Vehicles API: ${results.vehicles_api.message}\n`;
           if (results.vehicles_api.data?.length > 0) {
-            message += `   Sample: ${results.vehicles_api.data.map(v => v.name).join(', ')}\n`;
+            message += `   Sample: ${results.vehicles_api.data.map((v) => v.name).join(", ")}\n`;
           }
         } else {
-          message += `❌ Vehicles API: ${results.vehicles_api?.message || 'Error'}\n`;
+          message += `❌ Vehicles API: ${results.vehicles_api?.message || "Error"}\n`;
         }
 
-        if (results.collections?.status === 'success') {
+        if (results.collections?.status === "success") {
           message += `✅ Collections: ${results.collections.message}\n`;
           message += `   Enquiries: ${results.collections.data.enquiriesCount}\n`;
           message += `   Contacts: ${results.collections.data.contactsCount}\n`;
         }
 
-        message += '\n🎉 System is working!';
+        message += "\n🎉 System is working!";
         alert(message);
       } else {
         alert(`❌ System Test Failed: ${testData.message}`);
       }
     } catch (error) {
-      console.error('System test error:', error);
+      console.error("System test error:", error);
       // Test basic connectivity if main test fails
       try {
-        const healthResponse = await fetch('/api/health');
+        const healthResponse = await fetch("/api/health");
         if (healthResponse.ok) {
-          alert('⚠️ Server is online but some APIs are failing. Using fallback systems.');
+          alert(
+            "⚠️ Server is online but some APIs are failing. Using fallback systems.",
+          );
         } else {
-          alert('❌ Server connectivity issue. Please check your connection.');
+          alert("❌ Server connectivity issue. Please check your connection.");
         }
       } catch (healthError) {
-        alert('❌ Cannot connect to server. Please check if the server is running.');
+        alert(
+          "❌ Cannot connect to server. Please check if the server is running.",
+        );
       }
     }
   };
@@ -320,7 +348,9 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Dashboard Overview
+          </h1>
           <p className="text-gray-600">Tour Website Management Panel</p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -387,11 +417,15 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Visitors</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Visitors
+            </CardTitle>
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalVisitors || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalVisitors || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               <TrendingUp className="w-3 h-3 inline mr-1" />
               +12% from last month
@@ -401,11 +435,15 @@ export default function AdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tour Enquiries</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Tour Enquiries
+            </CardTitle>
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalEnquiries || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalEnquiries || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               <TrendingUp className="w-3 h-3 inline mr-1" />
               +8% from last month
@@ -415,11 +453,15 @@ export default function AdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Contact Messages</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Contact Messages
+            </CardTitle>
             <Phone className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalContacts || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalContacts || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               <TrendingUp className="w-3 h-3 inline mr-1" />
               +15% from last month
@@ -429,7 +471,9 @@ export default function AdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Conversion Rate
+            </CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -458,21 +502,36 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               {stats?.recentActivity && stats.recentActivity.length > 0 ? (
                 stats.recentActivity.map((activity, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className={`w-2 h-2 rounded-full ${
-                      activity.type === 'enquiry' ? 'bg-blue-500' : 'bg-green-500'
-                    }`} />
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                  >
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        activity.type === "enquiry"
+                          ? "bg-blue-500"
+                          : "bg-green-500"
+                      }`}
+                    />
                     <div className="flex-1">
                       <p className="text-sm font-medium">{activity.message}</p>
-                      <p className="text-xs text-gray-500">{formatDate(activity.timestamp)}</p>
+                      <p className="text-xs text-gray-500">
+                        {formatDate(activity.timestamp)}
+                      </p>
                     </div>
-                    <Badge variant={activity.type === 'enquiry' ? 'default' : 'secondary'}>
+                    <Badge
+                      variant={
+                        activity.type === "enquiry" ? "default" : "secondary"
+                      }
+                    >
                       {activity.type}
                     </Badge>
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500 text-center py-4">No recent activity</p>
+                <p className="text-gray-500 text-center py-4">
+                  No recent activity
+                </p>
               )}
             </div>
           </CardContent>
@@ -495,7 +554,9 @@ export default function AdminDashboard() {
                 <span className="text-lg font-bold text-blue-600">1,234</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                <span className="text-sm font-medium">Average Session Duration</span>
+                <span className="text-sm font-medium">
+                  Average Session Duration
+                </span>
                 <span className="text-lg font-bold text-green-600">3:45</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
@@ -515,9 +576,7 @@ export default function AdminDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>
-            Common administrative tasks
-          </CardDescription>
+          <CardDescription>Common administrative tasks</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

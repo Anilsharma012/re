@@ -1,17 +1,19 @@
-import { MongoClient, Db } from 'mongodb';
+import { MongoClient, Db } from "mongodb";
 
 let client: MongoClient | null = null;
 let db: Db | null = null;
 
-const MONGODB_PASSWORD = process.env.MONGODB_PASSWORD || 'Anilsharma123';
-const MONGODB_URI = process.env.MONGODB_URI || `mongodb+srv://Tour:${MONGODB_PASSWORD}@cluster0.mfp2blo.mongodb.net/tours?retryWrites=true&w=majority`;
-const DB_NAME = 'tours';
+const MONGODB_PASSWORD = process.env.MONGODB_PASSWORD || "Anilsharma123";
+const MONGODB_URI =
+  process.env.MONGODB_URI ||
+  `mongodb+srv://Tour:${MONGODB_PASSWORD}@cluster0.mfp2blo.mongodb.net/tours?retryWrites=true&w=majority`;
+const DB_NAME = "tours";
 
 // Fallback database system when MongoDB Atlas is unavailable
 let fallbackStorage = {
   vehicles: [
     {
-      _id: 'initial_fallback_1',
+      _id: "initial_fallback_1",
       name: "Maruti Suzuki Dzire",
       type: "Sedan",
       capacity: 4,
@@ -21,10 +23,10 @@ let fallbackStorage = {
       available: true,
       image: "./image/maruti.webp",
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     },
     {
-      _id: 'initial_fallback_2',
+      _id: "initial_fallback_2",
       name: "Toyota Innova Crysta",
       type: "SUV",
       capacity: 7,
@@ -34,28 +36,34 @@ let fallbackStorage = {
       available: true,
       image: "./image/c.avif",
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     },
     {
-      _id: 'initial_fallback_3',
+      _id: "initial_fallback_3",
       name: "Force Urbania",
       type: "Tempo Traveller",
       capacity: 12,
       price: 6500,
-      features: ["AC", "Reclining Seats", "GPS", "Entertainment", "Luggage Space"],
+      features: [
+        "AC",
+        "Reclining Seats",
+        "GPS",
+        "Entertainment",
+        "Luggage Space",
+      ],
       description: "Perfect for group tours and pilgrimages",
       available: true,
       image: "./image/t.jpg",
       createdAt: new Date(),
-      updatedAt: new Date()
-    }
+      updatedAt: new Date(),
+    },
   ],
   enquiries: [],
-  contacts: []
+  contacts: [],
 };
 
 function createFallbackDatabase(): Db {
-  console.log('📝 Creating fallback database with sample data');
+  console.log("📝 Creating fallback database with sample data");
   let idCounter = Date.now(); // Use timestamp to ensure unique IDs
 
   return {
@@ -64,34 +72,48 @@ function createFallbackDatabase(): Db {
       find: (filter: any = {}) => ({
         sort: () => ({
           limit: (num: number) => ({
-            toArray: () => Promise.resolve((fallbackStorage[name] || []).slice(0, num))
-          })
+            toArray: () =>
+              Promise.resolve((fallbackStorage[name] || []).slice(0, num)),
+          }),
         }),
-        toArray: () => Promise.resolve(fallbackStorage[name] || [])
+        toArray: () => Promise.resolve(fallbackStorage[name] || []),
       }),
       findOne: (filter: any) => {
-        const item = (fallbackStorage[name] || []).find(item => item._id === filter._id);
+        const item = (fallbackStorage[name] || []).find(
+          (item) => item._id === filter._id,
+        );
         return Promise.resolve(item || null);
       },
       insertOne: (doc: any) => {
         if (!fallbackStorage[name]) fallbackStorage[name] = [];
-        const newDoc = { ...doc, _id: `fallback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` };
+        const newDoc = {
+          ...doc,
+          _id: `fallback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        };
         fallbackStorage[name].push(newDoc);
         console.log(`📝 Fallback: Added to ${name}:`, newDoc._id);
         return Promise.resolve({ insertedId: newDoc._id });
       },
       insertMany: (docs: any[]) => {
         if (!fallbackStorage[name]) fallbackStorage[name] = [];
-        const newDocs = docs.map(doc => ({ ...doc, _id: `fallback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` }));
+        const newDocs = docs.map((doc) => ({
+          ...doc,
+          _id: `fallback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        }));
         fallbackStorage[name].push(...newDocs);
         console.log(`📝 Fallback: Added ${newDocs.length} to ${name}`);
         return Promise.resolve({ insertedCount: newDocs.length });
       },
       updateOne: (filter: any, update: any) => {
         if (!fallbackStorage[name]) fallbackStorage[name] = [];
-        const index = fallbackStorage[name].findIndex(item => item._id === filter._id);
+        const index = fallbackStorage[name].findIndex(
+          (item) => item._id === filter._id,
+        );
         if (index !== -1) {
-          fallbackStorage[name][index] = { ...fallbackStorage[name][index], ...update.$set };
+          fallbackStorage[name][index] = {
+            ...fallbackStorage[name][index],
+            ...update.$set,
+          };
           console.log(`📝 Fallback: Updated ${name}:`, filter._id);
           return Promise.resolve({ modifiedCount: 1 });
         }
@@ -99,7 +121,9 @@ function createFallbackDatabase(): Db {
       },
       deleteOne: (filter: any) => {
         if (!fallbackStorage[name]) fallbackStorage[name] = [];
-        const index = fallbackStorage[name].findIndex(item => item._id === filter._id);
+        const index = fallbackStorage[name].findIndex(
+          (item) => item._id === filter._id,
+        );
         if (index !== -1) {
           fallbackStorage[name].splice(index, 1);
           console.log(`📝 Fallback: Deleted from ${name}:`, filter._id);
@@ -112,8 +136,8 @@ function createFallbackDatabase(): Db {
         fallbackStorage[name] = [];
         console.log(`📝 Fallback: Cleared ${name}: ${count} items`);
         return Promise.resolve({ deletedCount: count });
-      }
-    })
+      },
+    }),
   } as any;
 }
 
@@ -124,7 +148,7 @@ export async function connectToDatabase(): Promise<Db> {
       await db.admin().ping();
       return db;
     } catch (error) {
-      console.log('🔄 Existing connection lost, reconnecting...');
+      console.log("🔄 Existing connection lost, reconnecting...");
       db = null;
       client = null;
     }
@@ -134,52 +158,53 @@ export async function connectToDatabase(): Promise<Db> {
   const connectionMethods = [
     {
       uri: `mongodb+srv://Tour:Anilsharma123@cluster0.mfp2blo.mongodb.net/tours?retryWrites=true&w=majority&ssl=false`,
-      options: { connectTimeoutMS: 30000, serverSelectionTimeoutMS: 30000 }
+      options: { connectTimeoutMS: 30000, serverSelectionTimeoutMS: 30000 },
     },
     {
       uri: `mongodb+srv://Tour:Anilsharma123@cluster0.mfp2blo.mongodb.net/tours`,
-      options: { connectTimeoutMS: 30000, serverSelectionTimeoutMS: 30000 }
+      options: { connectTimeoutMS: 30000, serverSelectionTimeoutMS: 30000 },
     },
     {
       uri: process.env.MONGODB_URI || MONGODB_URI,
-      options: { connectTimeoutMS: 10000, serverSelectionTimeoutMS: 10000 }
-    }
+      options: { connectTimeoutMS: 10000, serverSelectionTimeoutMS: 10000 },
+    },
   ];
 
   for (let i = 0; i < connectionMethods.length; i++) {
     const method = connectionMethods[i];
     try {
       console.log(`🔄 Attempting MongoDB Atlas connection method ${i + 1}...`);
-      console.log('URI:', method.uri.replace(/:[^:@]*@/, ':****@'));
+      console.log("URI:", method.uri.replace(/:[^:@]*@/, ":****@"));
 
       client = new MongoClient(method.uri, {
         ...method.options,
         maxPoolSize: 10,
         retryWrites: true,
-        authSource: 'admin'
+        authSource: "admin",
       });
 
       await client.connect();
-      console.log('✅ MongoDB client connected successfully');
+      console.log("✅ MongoDB client connected successfully");
 
       await client.db("admin").command({ ping: 1 });
-      console.log('✅ MongoDB ping successful');
+      console.log("✅ MongoDB ping successful");
 
       db = client.db(DB_NAME);
       console.log(`✅ Connected to MongoDB Atlas database: ${DB_NAME}`);
       return db;
-
     } catch (error) {
       console.error(`❌ Connection method ${i + 1} failed:`, error.message);
       if (client) {
-        try { await client.close(); } catch (e) {}
+        try {
+          await client.close();
+        } catch (e) {}
         client = null;
       }
     }
   }
 
-  console.error('❌ All MongoDB Atlas connection methods failed');
-  console.log('🔄 Creating fallback database system...');
+  console.error("❌ All MongoDB Atlas connection methods failed");
+  console.log("🔄 Creating fallback database system...");
   return createFallbackDatabase();
 }
 

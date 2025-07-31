@@ -14,7 +14,7 @@ import {
   updateContactStatus,
   updateEnquiryStatus,
   deleteContact,
-  deleteEnquiry
+  deleteEnquiry,
 } from "./routes/admin";
 import { seedTestData } from "./routes/testData";
 import { seedVehicles } from "./routes/seedVehicles";
@@ -32,7 +32,13 @@ import { simplePing } from "./routes/ping";
 import { testAllAPIs } from "./routes/apiTest";
 import { healthCheck } from "./routes/health";
 import { uploadVehicleImage, getUploadedImages } from "./routes/upload";
-import { getAllVehicles, getVehicle, createVehicle, updateVehicle, deleteVehicle } from "./routes/vehicles";
+import {
+  getAllVehicles,
+  getVehicle,
+  createVehicle,
+  updateVehicle,
+  deleteVehicle,
+} from "./routes/vehicles";
 
 export function createServer() {
   const app = express();

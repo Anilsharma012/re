@@ -40,19 +40,19 @@ export default function VehicleBooking({
 
   const fetchVehicles = async () => {
     try {
-      console.log('Fetching vehicles from MongoDB Atlas...');
-      const response = await fetch('/api/vehicles');
+      console.log("Fetching vehicles from MongoDB Atlas...");
+      const response = await fetch("/api/vehicles");
       const data = await response.json();
-      
+
       if (data.success && data.vehicles) {
         console.log(`✅ Loaded ${data.vehicles.length} vehicles from MongoDB`);
         setVehicles(data.vehicles);
       } else {
-        console.error('❌ No vehicles data received from MongoDB');
+        console.error("❌ No vehicles data received from MongoDB");
         setVehicles([]);
       }
     } catch (error) {
-      console.error('❌ Failed to fetch vehicles from MongoDB:', error);
+      console.error("❌ Failed to fetch vehicles from MongoDB:", error);
       setVehicles([]);
     } finally {
       setLoading(false);
@@ -118,7 +118,9 @@ export default function VehicleBooking({
         {loading && (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading vehicles from MongoDB Atlas...</p>
+            <p className="mt-4 text-gray-600">
+              Loading vehicles from MongoDB Atlas...
+            </p>
           </div>
         )}
 
@@ -129,14 +131,21 @@ export default function VehicleBooking({
               <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
                 {filteredVehicles.map((vehicle, index) => (
                   <div
-                    key={vehicle._id ? `${vehicle._id}-${index}` : `vehicle-${index}`}
+                    key={
+                      vehicle._id
+                        ? `${vehicle._id}-${index}`
+                        : `vehicle-${index}`
+                    }
                     className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     {/* Vehicle Image */}
                     <div className="relative h-40 overflow-hidden">
                       <img
-                        src={vehicle.image || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=300&fit=crop"}
+                        src={
+                          vehicle.image ||
+                          "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=300&fit=crop"
+                        }
                         alt={vehicle.name}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
@@ -217,9 +226,12 @@ export default function VehicleBooking({
             ) : (
               <div className="text-center py-12">
                 <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No Vehicles Available</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  No Vehicles Available
+                </h3>
                 <p className="text-gray-600 mb-4">
-                  No vehicles found in the database. Please add vehicles through the admin panel.
+                  No vehicles found in the database. Please add vehicles through
+                  the admin panel.
                 </p>
               </div>
             )}

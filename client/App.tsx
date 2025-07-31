@@ -27,11 +27,14 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <AdminLayout />
-            </ProtectedRoute>
-          }>
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="vehicles" element={<AdminVehicles />} />
             <Route path="contacts" element={<AdminContacts />} />
