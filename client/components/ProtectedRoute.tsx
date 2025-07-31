@@ -11,6 +11,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (token) {
+      console.log('🔒 Verifying admin token...');
+
       // Verify token validity by making a request to a protected endpoint
       fetch('/api/admin/stats', {
         headers: {
@@ -18,18 +20,25 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         },
       })
       .then(response => {
+        console.log('🔒 Token verification response:', response.status);
         if (response.ok) {
+          console.log('✅ Token valid, user authenticated');
           setIsAuthenticated(true);
         } else {
+          console.log('❌ Token invalid, removing');
           localStorage.removeItem('adminToken');
           setIsAuthenticated(false);
         }
       })
-      .catch(() => {
-        localStorage.removeItem('adminToken');
-        setIsAuthenticated(false);
+      .catch(error => {
+        console.error('❌ Token verification failed:', error.message);
+        // If the API is down, don't automatically log out the user
+        // Instead, allow them to stay authenticated
+        console.log('⚠️ API unavailable, keeping user logged in');
+        setIsAuthenticated(true);
       });
     } else {
+      console.log('❌ No admin token found');
       setIsAuthenticated(false);
     }
   }, []);
