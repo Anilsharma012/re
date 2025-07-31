@@ -234,14 +234,18 @@ export default function AdminDashboard() {
                 Manage Vehicles
               </Button>
             </Link>
-            <Button variant="outline" className="h-20 flex-col gap-2">
-              <MessageSquare className="w-6 h-6" />
-              View Enquiries
-            </Button>
-            <Button variant="outline" className="h-20 flex-col gap-2">
-              <Phone className="w-6 h-6" />
-              Contact Messages
-            </Button>
+            <Link to="/admin/enquiries">
+              <Button variant="outline" className="h-20 flex-col gap-2 w-full">
+                <MessageSquare className="w-6 h-6" />
+                View Enquiries
+              </Button>
+            </Link>
+            <Link to="/admin/contacts">
+              <Button variant="outline" className="h-20 flex-col gap-2 w-full">
+                <Phone className="w-6 h-6" />
+                Contact Messages
+              </Button>
+            </Link>
             <Button variant="outline" className="h-20 flex-col gap-2">
               <BarChart3 className="w-6 h-6" />
               Analytics Report
