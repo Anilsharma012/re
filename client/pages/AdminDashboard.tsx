@@ -86,6 +86,22 @@ export default function AdminDashboard() {
     });
   };
 
+  const testMongoConnection = async () => {
+    try {
+      console.log('🧪 Testing MongoDB Atlas connection...');
+      const response = await fetch('/api/debug/mongo-test');
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`✅ MongoDB Atlas Connected Successfully!\n\nDatabase: ${data.database}\nVehicles: ${data.collections.vehicles}\nEnquiries: ${data.collections.enquiries}\nContacts: ${data.collections.contacts}\n\nData will now save to MongoDB Atlas!`);
+      } else {
+        alert(`❌ MongoDB Atlas Connection Failed:\n${data.message}\n\nUsing fallback storage instead.`);
+      }
+    } catch (error) {
+      alert('❌ Cannot test MongoDB connection. Server may be offline.');
+    }
+  };
+
   const quickTestSystem = async () => {
     try {
       console.log('🧪 Running system tests...');
