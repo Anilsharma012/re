@@ -288,6 +288,24 @@ export default function AdminVehicles() {
     }
   };
 
+  const testConnection = async () => {
+    try {
+      console.log('🔧 Testing API connection...');
+      const response = await fetch('/api/health', {
+        signal: AbortSignal.timeout(5000)
+      });
+
+      if (response.ok) {
+        setMessage({ type: 'success', text: '✅ Server connection successful! API is responding normally.' });
+      } else {
+        setMessage({ type: 'error', text: `⚠️ Server responded with status ${response.status}` });
+      }
+    } catch (error) {
+      console.error('❌ Connection test failed:', error);
+      setMessage({ type: 'error', text: '❌ Cannot connect to server. Please check your internet connection and try again.' });
+    }
+  };
+
   const testStorage = async () => {
     try {
       const response = await fetch('/api/debug/storage');
