@@ -11,7 +11,7 @@ const DB_NAME = 'tours';
 let fallbackStorage = {
   vehicles: [
     {
-      _id: 'fallback_1',
+      _id: 'initial_fallback_1',
       name: "Maruti Suzuki Dzire",
       type: "Sedan",
       capacity: 4,
@@ -24,7 +24,7 @@ let fallbackStorage = {
       updatedAt: new Date()
     },
     {
-      _id: 'fallback_2',
+      _id: 'initial_fallback_2',
       name: "Toyota Innova Crysta",
       type: "SUV",
       capacity: 7,
@@ -37,7 +37,7 @@ let fallbackStorage = {
       updatedAt: new Date()
     },
     {
-      _id: 'fallback_3',
+      _id: 'initial_fallback_3',
       name: "Force Urbania",
       type: "Tempo Traveller",
       capacity: 12,
