@@ -166,7 +166,7 @@ export default function AdminVehicles() {
         error.message.includes("Server returned") ||
         error.message.includes("Server error")
       ) {
-        errorMessage = `🚫 ${error.message}`;
+        errorMessage = `��� ${error.message}`;
       } else if (error.name === "TypeError") {
         errorMessage = "🔌 Network connection issue. Please try again.";
       } else if (error.message) {
@@ -174,7 +174,6 @@ export default function AdminVehicles() {
       }
 
       setMessage({ type: "error", text: errorMessage });
-      setVehicles([]); // Set empty array as fallback
 
       // Retry once after 2 seconds if it's the first attempt
       if (retryCount === 0) {
@@ -182,6 +181,41 @@ export default function AdminVehicles() {
         setTimeout(() => {
           fetchVehicles(1);
         }, 2000);
+        setVehicles([]); // Set empty array for now
+      } else {
+        // After retry failed, show offline mode with sample vehicles
+        console.log("📱 Entering offline mode with sample vehicles...");
+        const offlineVehicles = [
+          {
+            _id: 'offline_1',
+            name: "Sample Vehicle 1",
+            type: "Sedan",
+            capacity: 4,
+            price: 2500,
+            features: ["AC", "GPS", "Music System"],
+            description: "Sample vehicle (offline mode)",
+            available: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          },
+          {
+            _id: 'offline_2',
+            name: "Sample Vehicle 2",
+            type: "SUV",
+            capacity: 7,
+            price: 4000,
+            features: ["AC", "Captain Seats", "GPS"],
+            description: "Sample vehicle (offline mode)",
+            available: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }
+        ];
+        setVehicles(offlineVehicles);
+        setMessage({
+          type: "error",
+          text: "📱 Offline mode: Showing sample vehicles. Server connection failed."
+        });
       }
     } finally {
       setLoading(false);
