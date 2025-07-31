@@ -111,6 +111,14 @@ export default function AdminVehicles() {
 
       setMessage({ type: 'error', text: errorMessage });
       setVehicles([]); // Set empty array as fallback
+
+      // Retry once after 2 seconds if it's the first attempt
+      if (retryCount === 0) {
+        console.log('🔄 Will retry fetching vehicles in 2 seconds...');
+        setTimeout(() => {
+          fetchVehicles(1);
+        }, 2000);
+      }
     } finally {
       setLoading(false);
     }
