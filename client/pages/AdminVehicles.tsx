@@ -1,0 +1,436 @@
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Textarea } from '../components/ui/textarea';
+import { Badge } from '../components/ui/badge';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Switch } from '../components/ui/switch';
+import { 
+  Car, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Users, 
+  IndianRupee,
+  Calendar,
+  CheckCircle,
+  XCircle
+} from 'lucide-react';
+
+interface Vehicle {
+  _id?: string;
+  name: string;
+  type: string;
+  capacity: number;
+  price: number;
+  features: string[];
+  image?: string;
+  description?: string;
+  available: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export default function AdminVehicles() {
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+  const [formData, setFormData] = useState<Partial<Vehicle>>({
+    name: '',
+    type: '',
+    capacity: 0,
+    price: 0,
+    features: [],
+    description: '',
+    available: true
+  });
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  useEffect(() => {
+    fetchVehicles();
+  }, []);
+
+  const fetchVehicles = async () => {
+    try {
+      const response = await fetch('/api/vehicles');
+      const data = await response.json();
+      if (data.success) {
+        setVehicles(data.vehicles || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch vehicles:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = localStorage.getItem('adminToken');
+    
+    try {
+      const url = editingVehicle 
+        ? `/api/admin/vehicles/${editingVehicle._id}`
+        : '/api/admin/vehicles';
+      
+      const method = editingVehicle ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...formData,
+          features: formData.features || []
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setMessage({ type: 'success', text: data.message });
+        setDialogOpen(false);
+        setEditingVehicle(null);
+        setFormData({
+          name: '',
+          type: '',
+          capacity: 0,
+          price: 0,
+          features: [],
+          description: '',
+          available: true
+        });
+        fetchVehicles();
+      } else {
+        setMessage({ type: 'error', text: data.message });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to save vehicle' });
+    }
+  };
+
+  const handleEdit = (vehicle: Vehicle) => {
+    setEditingVehicle(vehicle);
+    setFormData({
+      name: vehicle.name,
+      type: vehicle.type,
+      capacity: vehicle.capacity,
+      price: vehicle.price,
+      features: vehicle.features,
+      description: vehicle.description,
+      available: vehicle.available
+    });
+    setDialogOpen(true);
+  };
+
+  const handleDelete = async (vehicleId: string) => {
+    if (!confirm('Are you sure you want to delete this vehicle?')) return;
+    
+    const token = localStorage.getItem('adminToken');
+    
+    try {
+      const response = await fetch(`/api/admin/vehicles/${vehicleId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setMessage({ type: 'success', text: 'Vehicle deleted successfully' });
+        fetchVehicles();
+      } else {
+        setMessage({ type: 'error', text: data.message });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to delete vehicle' });
+    }
+  };
+
+  const handleFeaturesChange = (value: string) => {
+    const features = value.split(',').map(f => f.trim()).filter(f => f);
+    setFormData({ ...formData, features });
+  };
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading vehicles...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Vehicle Management</h1>
+          <p className="text-gray-600">Manage your fleet of vehicles</p>
+        </div>
+        
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button 
+              onClick={() => {
+                setEditingVehicle(null);
+                setFormData({
+                  name: '',
+                  type: '',
+                  capacity: 0,
+                  price: 0,
+                  features: [],
+                  description: '',
+                  available: true
+                });
+              }}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Vehicle
+            </Button>
+          </DialogTrigger>
+          
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {editingVehicle ? 'Edit Vehicle' : 'Add New Vehicle'}
+              </DialogTitle>
+              <DialogDescription>
+                {editingVehicle ? 'Update vehicle information' : 'Add a new vehicle to your fleet'}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name">Vehicle Name</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="e.g., Mahindra Scorpio"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="type">Vehicle Type</Label>
+                  <Select 
+                    value={formData.type} 
+                    onValueChange={(value) => setFormData({ ...formData, type: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SUV">SUV</SelectItem>
+                      <SelectItem value="Sedan">Sedan</SelectItem>
+                      <SelectItem value="Hatchback">Hatchback</SelectItem>
+                      <SelectItem value="Tempo Traveller">Tempo Traveller</SelectItem>
+                      <SelectItem value="Bus">Bus</SelectItem>
+                      <SelectItem value="Luxury">Luxury</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="capacity">Seating Capacity</Label>
+                  <Input
+                    id="capacity"
+                    type="number"
+                    value={formData.capacity}
+                    onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) })}
+                    placeholder="e.g., 7"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="price">Price (per day)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) })}
+                    placeholder="e.g., 2500"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="features">Features (comma-separated)</Label>
+                <Input
+                  id="features"
+                  value={formData.features?.join(', ')}
+                  onChange={(e) => handleFeaturesChange(e.target.value)}
+                  placeholder="AC, GPS, Music System, WiFi"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Vehicle description..."
+                  rows={3}
+                />
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="available"
+                  checked={formData.available}
+                  onCheckedChange={(checked) => setFormData({ ...formData, available: checked })}
+                />
+                <Label htmlFor="available">Available for booking</Label>
+              </div>
+              
+              <div className="flex justify-end gap-2 pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  {editingVehicle ? 'Update Vehicle' : 'Add Vehicle'}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Messages */}
+      {message && (
+        <Alert className={`mb-6 ${message.type === 'error' ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'}`}>
+          <AlertDescription className={message.type === 'error' ? 'text-red-700' : 'text-green-700'}>
+            {message.text}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Vehicles Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {vehicles.map((vehicle) => (
+          <Card key={vehicle._id} className="relative">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Car className="w-5 h-5" />
+                    {vehicle.name}
+                  </CardTitle>
+                  <CardDescription>{vehicle.type}</CardDescription>
+                </div>
+                <Badge variant={vehicle.available ? "default" : "secondary"}>
+                  {vehicle.available ? (
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                  ) : (
+                    <XCircle className="w-3 h-3 mr-1" />
+                  )}
+                  {vehicle.available ? 'Available' : 'Unavailable'}
+                </Badge>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              <div className="flex justify-between text-sm">
+                <span className="flex items-center gap-1 text-gray-600">
+                  <Users className="w-4 h-4" />
+                  {vehicle.capacity} seats
+                </span>
+                <span className="flex items-center gap-1 font-semibold text-green-600">
+                  <IndianRupee className="w-4 h-4" />
+                  {vehicle.price}/day
+                </span>
+              </div>
+              
+              {vehicle.features && vehicle.features.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {vehicle.features.slice(0, 3).map((feature, index) => (
+                    <Badge key={index} variant="outline" className="text-xs">
+                      {feature}
+                    </Badge>
+                  ))}
+                  {vehicle.features.length > 3 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{vehicle.features.length - 3} more
+                    </Badge>
+                  )}
+                </div>
+              )}
+              
+              {vehicle.description && (
+                <p className="text-sm text-gray-600 line-clamp-2">
+                  {vehicle.description}
+                </p>
+              )}
+              
+              <div className="flex justify-between items-center pt-2">
+                <span className="text-xs text-gray-500">
+                  <Calendar className="w-3 h-3 inline mr-1" />
+                  {vehicle.createdAt ? new Date(vehicle.createdAt).toLocaleDateString() : 'N/A'}
+                </span>
+                
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleEdit(vehicle)}
+                    className="flex items-center gap-1"
+                  >
+                    <Edit className="w-3 h-3" />
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleDelete(vehicle._id!)}
+                    className="flex items-center gap-1 text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {vehicles.length === 0 && (
+        <Card className="text-center py-12">
+          <CardContent>
+            <Car className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No vehicles found</h3>
+            <p className="text-gray-600 mb-4">Get started by adding your first vehicle to the fleet.</p>
+            <Button onClick={() => setDialogOpen(true)} className="flex items-center gap-2 mx-auto">
+              <Plus className="w-4 h-4" />
+              Add Your First Vehicle
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
