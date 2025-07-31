@@ -24,6 +24,7 @@ import { testMongoConnection } from "./routes/mongoTest";
 import { testDirectMongo } from "./routes/testDirectMongo";
 import { testCompleteVehicleFlow } from "./routes/testVehicleFlow";
 import { instantMongoTest } from "./routes/instantMongoTest";
+import { forceMongoTest } from "./routes/forceMongo";
 import { testAllAPIs } from "./routes/apiTest";
 import { healthCheck } from "./routes/health";
 import { uploadVehicleImage, getUploadedImages } from "./routes/upload";
