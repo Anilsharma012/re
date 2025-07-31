@@ -181,10 +181,25 @@ export const getContacts: RequestHandler = async (req, res) => {
 export const getEnquiries: RequestHandler = async (req, res) => {
   try {
     const db = await getDatabase();
-    const enquiries = await db.collection('enquiries')
-      .find({})
-      .sort({ createdAt: -1 })
-      .toArray();
+
+    // Handle both real MongoDB and fallback database
+    let enquiries;
+    try {
+      enquiries = await db.collection('enquiries')
+        .find({})
+        .sort({ createdAt: -1 })
+        .toArray();
+    } catch (sortError) {
+      // Fallback database doesn't support sort().toArray()
+      const findResult = await db.collection('enquiries').find({});
+      enquiries = Array.isArray(findResult) ? findResult : [];
+      // Sort manually if needed
+      enquiries.sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0);
+        const dateB = new Date(b.createdAt || 0);
+        return dateB.getTime() - dateA.getTime();
+      });
+    }
 
     res.json({
       success: true,
