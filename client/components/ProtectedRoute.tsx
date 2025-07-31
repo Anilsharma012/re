@@ -13,19 +13,20 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     if (token) {
       console.log('🔒 Verifying admin token...');
 
-      // Verify token validity by making a request to a protected endpoint
-      fetch('/api/admin/stats', {
+      // Verify token validity using dedicated endpoint
+      fetch('/api/admin/verify-token', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       })
-      .then(response => {
-        console.log('🔒 Token verification response:', response.status);
-        if (response.ok) {
-          console.log('✅ Token valid, user authenticated');
+      .then(response => response.json())
+      .then(data => {
+        console.log('🔒 Token verification response:', data);
+        if (data.success && data.authenticated) {
+          console.log('✅ Token valid, user authenticated as:', data.user?.username);
           setIsAuthenticated(true);
         } else {
-          console.log('❌ Token invalid, removing');
+          console.log('❌ Token invalid, removing:', data.message);
           localStorage.removeItem('adminToken');
           setIsAuthenticated(false);
         }
@@ -33,8 +34,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       .catch(error => {
         console.error('❌ Token verification failed:', error.message);
         // If the API is down, don't automatically log out the user
-        // Instead, allow them to stay authenticated
-        console.log('⚠️ API unavailable, keeping user logged in');
+        // Instead, allow them to stay authenticated for better UX
+        console.log('⚠️ Network error during token verification, keeping user logged in');
         setIsAuthenticated(true);
       });
     } else {
