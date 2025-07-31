@@ -119,37 +119,68 @@ function createFallbackDatabase(): Db {
 
 export async function connectToDatabase(): Promise<Db> {
   if (db) {
-    return db;
+    try {
+      // Test if existing connection is still alive
+      await db.admin().ping();
+      return db;
+    } catch (error) {
+      console.log('🔄 Existing connection lost, reconnecting...');
+      db = null;
+      client = null;
+    }
   }
 
-  try {
-    console.log('🔄 Attempting to connect to MongoDB Atlas...');
-    console.log('URI:', MONGODB_URI.replace(/:[^:@]*@/, ':****@'));
+  // Try multiple connection methods
+  const connectionMethods = [
+    {
+      uri: `mongodb+srv://Tour:Anilsharma123@cluster0.mfp2blo.mongodb.net/tours?retryWrites=true&w=majority&ssl=false`,
+      options: { connectTimeoutMS: 30000, serverSelectionTimeoutMS: 30000 }
+    },
+    {
+      uri: `mongodb+srv://Tour:Anilsharma123@cluster0.mfp2blo.mongodb.net/tours`,
+      options: { connectTimeoutMS: 30000, serverSelectionTimeoutMS: 30000 }
+    },
+    {
+      uri: process.env.MONGODB_URI || MONGODB_URI,
+      options: { connectTimeoutMS: 10000, serverSelectionTimeoutMS: 10000 }
+    }
+  ];
 
-    client = new MongoClient(MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 10000,
-      maxPoolSize: 10,
-      retryWrites: true,
-      authSource: 'admin'
-    });
+  for (let i = 0; i < connectionMethods.length; i++) {
+    const method = connectionMethods[i];
+    try {
+      console.log(`🔄 Attempting MongoDB Atlas connection method ${i + 1}...`);
+      console.log('URI:', method.uri.replace(/:[^:@]*@/, ':****@'));
 
-    await client.connect();
-    console.log('✅ MongoDB client connected successfully');
+      client = new MongoClient(method.uri, {
+        ...method.options,
+        maxPoolSize: 10,
+        retryWrites: true,
+        authSource: 'admin'
+      });
 
-    await client.db("admin").command({ ping: 1 });
-    console.log('✅ MongoDB ping successful');
+      await client.connect();
+      console.log('✅ MongoDB client connected successfully');
 
-    db = client.db(DB_NAME);
-    console.log(`✅ Connected to MongoDB Atlas database: ${DB_NAME}`);
-    return db;
-  } catch (error) {
-    console.error('❌ MongoDB Atlas connection failed:', error.message);
+      await client.db("admin").command({ ping: 1 });
+      console.log('✅ MongoDB ping successful');
 
-    // Instead of throwing error, create a working fallback
-    console.log('🔄 Creating fallback database system...');
-    return createFallbackDatabase();
+      db = client.db(DB_NAME);
+      console.log(`✅ Connected to MongoDB Atlas database: ${DB_NAME}`);
+      return db;
+
+    } catch (error) {
+      console.error(`❌ Connection method ${i + 1} failed:`, error.message);
+      if (client) {
+        try { await client.close(); } catch (e) {}
+        client = null;
+      }
+    }
   }
+
+  console.error('❌ All MongoDB Atlas connection methods failed');
+  console.log('🔄 Creating fallback database system...');
+  return createFallbackDatabase();
 }
 
 // No mock database - MongoDB Atlas only
