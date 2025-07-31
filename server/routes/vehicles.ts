@@ -25,21 +25,27 @@ export interface VehicleResponse {
 // Get all vehicles
 export const getAllVehicles: RequestHandler = async (req, res) => {
   try {
+    console.log('🚗 Fetching vehicles...');
     const db = await getDatabase();
     const vehicles = await db.collection('vehicles').find({}).toArray();
-    
+
+    console.log(`✅ Retrieved ${vehicles.length} vehicles`);
+
     const response: VehicleResponse = {
       success: true,
       message: 'Vehicles retrieved successfully',
       vehicles: vehicles as Vehicle[]
     };
-    
+
     res.json(response);
   } catch (error) {
-    console.error('Error fetching vehicles:', error);
-    res.status(500).json({
+    console.error('❌ Error fetching vehicles:', error.message);
+
+    // Return a proper error response instead of 500
+    res.json({
       success: false,
-      message: 'Failed to fetch vehicles'
+      message: 'Database temporarily unavailable. Please try again later.',
+      vehicles: []
     });
   }
 };
