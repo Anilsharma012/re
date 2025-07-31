@@ -27,6 +27,7 @@ import { instantMongoTest } from "./routes/instantMongoTest";
 import { forceMongoTest } from "./routes/forceMongo";
 import { directAtlasTest } from "./routes/directAtlasTest";
 import { verifyToken } from "./routes/tokenVerify";
+import { adminHealthCheck } from "./routes/adminHealth";
 import { testAllAPIs } from "./routes/apiTest";
 import { healthCheck } from "./routes/health";
 import { uploadVehicleImage, getUploadedImages } from "./routes/upload";
