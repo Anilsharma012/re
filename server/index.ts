@@ -56,6 +56,7 @@ export function createServer() {
 
   // Admin routes
   app.post("/api/admin/login", adminLogin);
+  app.get("/api/admin/verify-token", verifyToken);
   app.get("/api/admin/stats", verifyAdmin, getAdminStats);
   app.get("/api/admin/contacts", verifyAdmin, getContacts);
   app.get("/api/admin/enquiries", verifyAdmin, getEnquiries);
