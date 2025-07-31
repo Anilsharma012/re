@@ -56,7 +56,7 @@ let fallbackStorage = {
 
 function createFallbackDatabase(): Db {
   console.log('📝 Creating fallback database with sample data');
-  let idCounter = 100;
+  let idCounter = Date.now(); // Use timestamp to ensure unique IDs
 
   return {
     collection: (name: string) => ({
