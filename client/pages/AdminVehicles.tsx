@@ -134,8 +134,13 @@ export default function AdminVehicles() {
 
       const method = editingVehicle ? 'PUT' : 'POST';
 
+      // Add timeout and better error handling for vehicle submission
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout for uploads
+
       const response = await fetch(url, {
         method,
+        signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -145,6 +150,12 @@ export default function AdminVehicles() {
           features: finalFormData.features || []
         }),
       });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
 
