@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { ContactFormData, ContactResponse } from "@shared/api";
 import { sendEmail } from "../services/emailService";
+import { getDatabase } from "../services/database";
 
 export const handleContact: RequestHandler = async (req, res) => {
   try {
@@ -35,6 +36,21 @@ ${formData.message}
 This message was submitted through the Om Tour & Travels contact form.
 Please respond to the customer at ${formData.email} or ${formData.phone}.
     `;
+
+    // Save to MongoDB
+    try {
+      const db = await getDatabase();
+      const contactWithTimestamp = {
+        ...formData,
+        createdAt: new Date(),
+        status: 'new'
+      };
+      await db.collection('contacts').insertOne(contactWithTimestamp);
+      console.log('✅ Contact message saved to database');
+    } catch (dbError) {
+      console.error('⚠️ Failed to save to database:', dbError);
+      // Continue with email sending even if DB save fails
+    }
 
     // Send email using email service
     console.log("📧 New Contact Form Submission:");
