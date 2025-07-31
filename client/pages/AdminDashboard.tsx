@@ -209,14 +209,22 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
           <p className="text-gray-600">Tour Website Management Panel</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            onClick={testDirectMongo}
+            variant="default"
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+          >
+            <BarChart3 className="w-4 h-4" />
+            🚀 Test MongoDB
+          </Button>
           <Button
             onClick={testMongoConnection}
             variant="outline"
             className="flex items-center gap-2"
           >
             <BarChart3 className="w-4 h-4" />
-            Test MongoDB
+            Test Connection
           </Button>
           <Button
             onClick={quickTestSystem}
