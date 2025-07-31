@@ -102,6 +102,32 @@ export default function AdminDashboard() {
     }
   };
 
+  const testDirectMongo = async () => {
+    try {
+      console.log('🚀 Testing direct MongoDB Atlas connection...');
+      const response = await fetch('/api/debug/mongo-direct');
+      const data = await response.json();
+
+      if (data.success) {
+        let message = `🎉 MongoDB Atlas Connected Successfully!\n\n`;
+        message += `Database: ${data.database}\n`;
+        message += `Collections: ${data.collections.join(', ')}\n`;
+        message += `Total Vehicles: ${data.vehicleCount}\n`;
+        message += `Test Vehicle ID: ${data.testInsertId}\n\n`;
+        message += `Recent Vehicles:\n`;
+        data.vehicles.slice(-3).forEach(v => {
+          message += `• ${v.name} (${v.type}) - ₹${v.price}\n`;
+        });
+        message += `\n✅ Data is saving to MongoDB Atlas!`;
+        alert(message);
+      } else {
+        alert(`❌ Direct MongoDB Connection Failed:\n${data.message}\n\nError: ${data.error}`);
+      }
+    } catch (error) {
+      alert('❌ Cannot test direct MongoDB connection. Server may be offline.');
+    }
+  };
+
   const quickTestSystem = async () => {
     try {
       console.log('🧪 Running system tests...');
