@@ -102,6 +102,35 @@ export default function AdminDashboard() {
     }
   };
 
+  const directAtlasTest = async () => {
+    try {
+      console.log('🔥🔥🔥 DIRECT ATLAS TEST STARTING...');
+      const response = await fetch('/api/debug/direct-atlas');
+      const data = await response.json();
+
+      if (data.success) {
+        let message = `🎉🎉🎉 DIRECT ATLAS CONNECTION सफल!\n\n`;
+        message += `MongoDB Atlas में data save हो गया!\n\n`;
+        message += `Total Vehicles: ${data.totalVehicles}\n`;
+        message += `Test Insert ID: ${data.insertedId}\n\n`;
+        message += `All Vehicles in MongoDB Atlas:\n`;
+        data.allVehicles.forEach(v => {
+          message += `• ${v.name} (${v.type}) - ₹${v.price}\n`;
+        });
+        message += `\n✅ अब आप MongoDB Atlas में अपना data देख सकते हैं!`;
+        message += `\n🔄 Admin panel से vehicles add करें - सब MongoDB में जाएगा!`;
+        alert(message);
+
+        // Refresh the page to show updated data
+        window.location.reload();
+      } else {
+        alert(`❌ Direct Atlas Test Failed:\n${data.message}\n\nError: ${data.error}`);
+      }
+    } catch (error) {
+      alert('❌ Direct Atlas test failed. Server may be offline.');
+    }
+  };
+
   const forceMongoTest = async () => {
     try {
       console.log('🔥🔥🔥 FORCE MongoDB Atlas connection test...');
