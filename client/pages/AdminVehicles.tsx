@@ -296,14 +296,21 @@ export default function AdminVehicles() {
   const testConnection = async () => {
     try {
       console.log('🔧 Testing API connection...');
+      setMessage({ type: 'success', text: '⏳ Testing connection...' });
+
       const response = await fetch('/api/health', {
-        signal: AbortSignal.timeout(5000)
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
       if (response.ok) {
+        const data = await response.json();
         setMessage({ type: 'success', text: '✅ Server connection successful! API is responding normally.' });
+        console.log('✅ Connection test passed:', data);
       } else {
-        setMessage({ type: 'error', text: `⚠️ Server responded with status ${response.status}` });
+        setMessage({ type: 'error', text: `⚠️ Server responded with status ${response.status} - ${response.statusText}` });
       }
     } catch (error) {
       console.error('❌ Connection test failed:', error);
