@@ -71,6 +71,35 @@ export default function AdminDashboard() {
     });
   };
 
+  const quickTestSystem = async () => {
+    try {
+      // Test adding a vehicle
+      const testResponse = await fetch('/api/debug/quick-test', {
+        method: 'POST'
+      });
+      const testData = await testResponse.json();
+
+      // Get storage status
+      const storageResponse = await fetch('/api/debug/storage');
+      const storageData = await storageResponse.json();
+
+      if (testData.success && storageData.success) {
+        alert(`✅ System Test Successful!
+
+Vehicle Added: ${testData.vehicle.name}
+Storage Type: ${storageData.storage.type}
+Total Vehicles: ${storageData.storage.collections.vehicles}
+
+System is working properly!`);
+      } else {
+        alert('❌ System test failed. Check console for details.');
+      }
+    } catch (error) {
+      console.error('Quick test error:', error);
+      alert('❌ System test error. Check console for details.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-6">
@@ -85,9 +114,19 @@ export default function AdminDashboard() {
   return (
     <div className="p-6">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-        <p className="text-gray-600">Tour Website Management Panel</p>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+          <p className="text-gray-600">Tour Website Management Panel</p>
+        </div>
+        <Button
+          onClick={quickTestSystem}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <Activity className="w-4 h-4" />
+          Quick Test System
+        </Button>
       </div>
 
       {/* Stats Cards */}
