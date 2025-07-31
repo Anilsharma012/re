@@ -11,6 +11,8 @@ import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminVehicles from "./pages/AdminVehicles";
+import AdminContacts from "./pages/AdminContacts";
+import AdminEnquiries from "./pages/AdminEnquiries";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminLayout } from "./components/AdminLayout";
 
@@ -32,6 +34,8 @@ const App = () => (
           }>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="vehicles" element={<AdminVehicles />} />
+            <Route path="contacts" element={<AdminContacts />} />
+            <Route path="enquiries" element={<AdminEnquiries />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
