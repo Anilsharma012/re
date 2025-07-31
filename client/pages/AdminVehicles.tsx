@@ -60,14 +60,52 @@ export default function AdminVehicles() {
   }, []);
 
   const fetchVehicles = async () => {
+    console.log('🚗 Fetching vehicles for admin panel...');
+
     try {
-      const response = await fetch('/api/vehicles');
+      // Add timeout and better error handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+      const response = await fetch('/api/vehicles', {
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log('✅ Vehicles fetch response:', data);
+
       if (data.success) {
         setVehicles(data.vehicles || []);
+        setMessage({ type: 'success', text: `Loaded ${data.vehicles?.length || 0} vehicles successfully` });
+      } else {
+        console.warn('⚠️ Vehicles fetch unsuccessful:', data.message);
+        setVehicles([]);
+        setMessage({ type: 'error', text: data.message || 'Failed to fetch vehicles' });
       }
     } catch (error) {
-      console.error('Failed to fetch vehicles:', error);
+      console.error('❌ Failed to fetch vehicles:', error);
+
+      // Provide user-friendly error message
+      let errorMessage = 'Failed to load vehicles';
+      if (error.name === 'AbortError') {
+        errorMessage = 'Request timeout - server is taking too long to respond';
+      } else if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Cannot connect to server - please check your internet connection';
+      } else if (error.message.includes('HTTP error')) {
+        errorMessage = `Server error: ${error.message}`;
+      }
+
+      setMessage({ type: 'error', text: errorMessage });
+      setVehicles([]); // Set empty array as fallback
     } finally {
       setLoading(false);
     }
