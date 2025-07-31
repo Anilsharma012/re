@@ -64,21 +64,20 @@ export default function AdminVehicles() {
     console.log('🚗 Fetching vehicles for admin panel...');
 
     try {
-      // Add timeout and better error handling
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      console.log('🚗 Fetching vehicles from API...');
 
       const response = await fetch('/api/vehicles', {
-        signal: controller.signal,
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
         }
       });
 
-      clearTimeout(timeoutId);
+      console.log('📡 Response status:', response.status);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
