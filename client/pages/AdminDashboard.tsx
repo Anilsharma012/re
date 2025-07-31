@@ -239,6 +239,14 @@ export default function AdminDashboard() {
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button
+            onClick={testInstantMongo}
+            variant="default"
+            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white"
+          >
+            <BarChart3 className="w-4 h-4" />
+            🔥 Fix MongoDB
+          </Button>
+          <Button
             onClick={testDirectMongo}
             variant="default"
             className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
