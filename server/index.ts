@@ -65,6 +65,8 @@ export function createServer() {
   app.get("/api/admin/health", adminHealthCheck);
   app.post("/api/admin/login", adminLogin);
   app.get("/api/admin/verify-token", verifyToken);
+  app.get("/api/admin/debug-auth", debugAuth);
+  app.get("/api/admin/fresh-token", generateFreshToken);
   app.get("/api/admin/stats", verifyAdmin, getAdminStats);
   app.get("/api/admin/contacts", verifyAdmin, getContacts);
   app.get("/api/admin/enquiries", verifyAdmin, getEnquiries);
