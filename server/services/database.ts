@@ -82,7 +82,7 @@ function createFallbackDatabase(): Db {
       },
       insertMany: (docs: any[]) => {
         if (!fallbackStorage[name]) fallbackStorage[name] = [];
-        const newDocs = docs.map(doc => ({ ...doc, _id: `fallback_${idCounter++}` }));
+        const newDocs = docs.map(doc => ({ ...doc, _id: `fallback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}` }));
         fallbackStorage[name].push(...newDocs);
         console.log(`📝 Fallback: Added ${newDocs.length} to ${name}`);
         return Promise.resolve({ insertedCount: newDocs.length });
