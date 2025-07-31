@@ -3,7 +3,7 @@ import { MongoClient, Db } from 'mongodb';
 let client: MongoClient | null = null;
 let db: Db | null = null;
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Tour:admin123@cluster0.mfp2blo.mongodb.net/';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://Tour:admin123@cluster0.mfp2blo.mongodb.net/?retryWrites=true&w=majority';
 const DB_NAME = 'tour_admin';
 
 // In-memory storage as fallback
@@ -20,17 +20,18 @@ export async function connectToDatabase(): Promise<Db> {
 
   try {
     client = new MongoClient(MONGODB_URI, {
-      tlsAllowInvalidCertificates: true,
-      tlsAllowInvalidHostnames: true,
-      connectTimeoutMS: 30000,
-      socketTimeoutMS: 30000,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      family: 4
     });
     await client.connect();
+    await client.db("admin").command({ ping: 1 });
     db = client.db(DB_NAME);
-    console.log('Connected to MongoDB successfully');
+    console.log('Connected to MongoDB Atlas successfully');
     return db;
   } catch (error) {
-    console.error('Failed to connect to MongoDB, using memory storage:', error);
+    console.error('Failed to connect to MongoDB Atlas, using memory storage:', error);
     // Return a mock database object for development
     return createMockDatabase();
   }
