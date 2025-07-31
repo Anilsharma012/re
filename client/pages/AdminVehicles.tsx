@@ -250,18 +250,56 @@ export default function AdminVehicles() {
 
       console.log("💾 Submitting vehicle data...");
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          "Cache-Control": "no-cache",
-        },
-        body: JSON.stringify({
-          ...finalFormData,
-          features: finalFormData.features || [],
-        }),
-      });
+      // Create a robust fetch request that bypasses tracking script interference
+      let response;
+      try {
+        // Try using XMLHttpRequest as fallback to bypass FullStory interference
+        response = await new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open(method, url);
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+          xhr.setRequestHeader("Cache-Control", "no-cache");
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve({
+                ok: true,
+                status: xhr.status,
+                statusText: xhr.statusText,
+                json: () => Promise.resolve(JSON.parse(xhr.responseText))
+              });
+            } else {
+              reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
+            }
+          };
+
+          xhr.onerror = () => reject(new Error('Network error'));
+          xhr.ontimeout = () => reject(new Error('Request timeout'));
+          xhr.timeout = 30000; // 30 second timeout
+
+          xhr.send(JSON.stringify({
+            ...finalFormData,
+            features: finalFormData.features || [],
+          }));
+        });
+      } catch (xhrError) {
+        // If XMLHttpRequest fails, try native fetch with additional headers
+        console.log('🔄 XMLHttpRequest failed, trying native fetch...');
+        response = await fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "Cache-Control": "no-cache",
+            "X-Requested-With": "XMLHttpRequest", // Help bypass tracking scripts
+          },
+          body: JSON.stringify({
+            ...finalFormData,
+            features: finalFormData.features || [],
+          }),
+        });
+      }
 
       console.log("📡 Submit response status:", response.status);
 
