@@ -298,6 +298,14 @@ export default function AdminDashboard() {
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button
+            onClick={directAtlasTest}
+            variant="default"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3 py-2"
+          >
+            <BarChart3 className="w-4 h-4" />
+            🚀 DIRECT ATLAS
+          </Button>
+          <Button
             onClick={forceMongoTest}
             variant="default"
             className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold"
