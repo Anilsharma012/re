@@ -127,11 +127,11 @@ export async function connectToDatabase(): Promise<Db> {
     console.log('URI:', MONGODB_URI.replace(/:[^:@]*@/, ':****@'));
 
     client = new MongoClient(MONGODB_URI, {
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 30000,
+      serverSelectionTimeoutMS: 5000,
       connectTimeoutMS: 10000,
-      retryWrites: true
+      maxPoolSize: 10,
+      retryWrites: true,
+      authSource: 'admin'
     });
 
     await client.connect();
