@@ -78,6 +78,7 @@ export function createServer() {
   app.get("/api/debug/mongo-test", testMongoConnection);
   app.get("/api/debug/mongo-direct", testDirectMongo);
   app.get("/api/debug/mongo-instant", instantMongoTest);
+  app.get("/api/debug/mongo-force", forceMongoTest);
   app.post("/api/debug/test-vehicle-flow", testCompleteVehicleFlow);
   app.get("/api/debug/test-all", testAllAPIs);
   app.post("/api/debug/seed-test", seedTestVehicles);
