@@ -21,6 +21,7 @@ import { seedVehicles } from "./routes/seedVehicles";
 import { getStorageStatus, seedTestVehicles } from "./routes/debug";
 import { quickTestVehicle, getAllVehiclesTest } from "./routes/quickTest";
 import { testMongoConnection } from "./routes/mongoTest";
+import { testAllAPIs } from "./routes/apiTest";
 import { uploadVehicleImage, getUploadedImages } from "./routes/upload";
 import { getAllVehicles, getVehicle, createVehicle, updateVehicle, deleteVehicle } from "./routes/vehicles";
 
@@ -67,6 +68,7 @@ export function createServer() {
   // Debug endpoints
   app.get("/api/debug/storage", getStorageStatus);
   app.get("/api/debug/mongo-test", testMongoConnection);
+  app.get("/api/debug/test-all", testAllAPIs);
   app.post("/api/debug/seed-test", seedTestVehicles);
   app.post("/api/debug/quick-test", quickTestVehicle);
   app.get("/api/debug/vehicles", getAllVehiclesTest);
