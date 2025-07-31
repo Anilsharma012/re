@@ -88,13 +88,41 @@ export default function AdminVehicles() {
     );
 
     try {
-      const response = await fetch("/api/vehicles", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
-        },
-      });
+      // Check if server is reachable first
+      let response;
+      try {
+        response = await Promise.race([
+          fetch("/api/vehicles", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Cache-Control": "no-cache",
+            },
+          }),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Request timeout')), 10000)
+          )
+        ]);
+      } catch (fetchError) {
+        // If fetch fails completely, try a simpler endpoint first
+        console.log('🔧 Primary fetch failed, testing server connectivity...');
+        try {
+          const pingResponse = await fetch("/api/simple-ping");
+          if (pingResponse.ok) {
+            console.log('✅ Server is reachable, retrying vehicles fetch...');
+            response = await fetch("/api/vehicles", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+          } else {
+            throw new Error('Server not responding');
+          }
+        } catch (pingError) {
+          throw new Error('Cannot connect to server');
+        }
+      }
 
       console.log("📡 Response status:", response.status);
 
