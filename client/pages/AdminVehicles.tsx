@@ -220,12 +220,22 @@ export default function AdminVehicles() {
     const token = localStorage.getItem('adminToken');
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
       const response = await fetch(`/api/admin/vehicles/${vehicleId}`, {
         method: 'DELETE',
+        signal: controller.signal,
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
 
@@ -233,10 +243,21 @@ export default function AdminVehicles() {
         setMessage({ type: 'success', text: 'Vehicle deleted successfully' });
         fetchVehicles();
       } else {
-        setMessage({ type: 'error', text: data.message });
+        setMessage({ type: 'error', text: data.message || 'Failed to delete vehicle' });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to delete vehicle' });
+      console.error('❌ Failed to delete vehicle:', error);
+
+      let errorMessage = 'Failed to delete vehicle';
+      if (error.name === 'AbortError') {
+        errorMessage = 'Request timeout - server is taking too long to respond';
+      } else if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Cannot connect to server - please check your internet connection';
+      } else if (error.message.includes('HTTP error')) {
+        errorMessage = `Server error: ${error.message}`;
+      }
+
+      setMessage({ type: 'error', text: errorMessage });
     }
   };
 
