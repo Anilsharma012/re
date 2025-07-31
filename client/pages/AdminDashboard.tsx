@@ -73,35 +73,46 @@ export default function AdminDashboard() {
 
   const quickTestSystem = async () => {
     try {
-      // Test MongoDB connection
-      const mongoResponse = await fetch('/api/debug/mongo-test');
-      const mongoData = await mongoResponse.json();
+      console.log('🧪 Running system tests...');
 
-      if (mongoData.success) {
-        alert(`🎉 MongoDB Atlas Test Successful!
+      // Test all APIs
+      const testResponse = await fetch('/api/debug/test-all');
+      const testData = await testResponse.json();
 
-${mongoData.message}
+      if (testData.success) {
+        const results = testData.results.tests;
 
-Database: ${mongoData.details.database}
-Operations: ${mongoData.details.operations}
+        let message = '🧪 System Test Results:\n\n';
 
-Collections:
-- Vehicles: ${mongoData.details.collections.vehicles}
-- Enquiries: ${mongoData.details.collections.enquiries}
-- Contacts: ${mongoData.details.collections.contacts}
+        if (results.database?.status === 'success') {
+          message += `✅ Database: ${results.database.message}\n`;
+        } else {
+          message += `⚠️ Database: ${results.database?.message || 'Error'}\n`;
+        }
 
-✅ All data is now saving to MongoDB Atlas only!`);
+        if (results.vehicles_api?.status === 'success') {
+          message += `✅ Vehicles API: ${results.vehicles_api.message}\n`;
+          if (results.vehicles_api.data?.length > 0) {
+            message += `   Sample: ${results.vehicles_api.data.map(v => v.name).join(', ')}\n`;
+          }
+        } else {
+          message += `❌ Vehicles API: ${results.vehicles_api?.message || 'Error'}\n`;
+        }
+
+        if (results.collections?.status === 'success') {
+          message += `✅ Collections: ${results.collections.message}\n`;
+          message += `   Enquiries: ${results.collections.data.enquiriesCount}\n`;
+          message += `   Contacts: ${results.collections.data.contactsCount}\n`;
+        }
+
+        message += '\n🎉 System is working!';
+        alert(message);
       } else {
-        alert(`❌ MongoDB Atlas Test Failed!
-
-Error: ${mongoData.message}
-Details: ${mongoData.details}
-
-Please check your connection settings.`);
+        alert(`❌ System Test Failed: ${testData.message}`);
       }
     } catch (error) {
-      console.error('MongoDB test error:', error);
-      alert('❌ MongoDB test error. Check console for details.');
+      console.error('System test error:', error);
+      alert('❌ System test failed. Check console for details.');
     }
   };
 
@@ -130,7 +141,7 @@ Please check your connection settings.`);
           className="flex items-center gap-2"
         >
           <Activity className="w-4 h-4" />
-          Test MongoDB Atlas
+          Test All Systems
         </Button>
       </div>
 
