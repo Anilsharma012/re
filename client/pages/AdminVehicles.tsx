@@ -47,8 +47,11 @@ export default function AdminVehicles() {
     price: 0,
     features: [],
     description: '',
-    available: true
+    available: true,
+    image: ''
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
@@ -72,14 +75,26 @@ export default function AdminVehicles() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem('adminToken');
-    
+
     try {
-      const url = editingVehicle 
+      let finalFormData = { ...formData };
+
+      // Upload image if there's a new one
+      if (imageFile && imagePreview) {
+        try {
+          const uploadedImageUrl = await uploadImage(imagePreview);
+          finalFormData.image = uploadedImageUrl;
+        } catch (error) {
+          console.error('Image upload failed, proceeding without image:', error);
+        }
+      }
+
+      const url = editingVehicle
         ? `/api/admin/vehicles/${editingVehicle._id}`
         : '/api/admin/vehicles';
-      
+
       const method = editingVehicle ? 'PUT' : 'POST';
-      
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -87,13 +102,13 @@ export default function AdminVehicles() {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          ...formData,
-          features: formData.features || []
+          ...finalFormData,
+          features: finalFormData.features || []
         }),
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         setMessage({ type: 'success', text: data.message });
         setDialogOpen(false);
@@ -105,8 +120,11 @@ export default function AdminVehicles() {
           price: 0,
           features: [],
           description: '',
-          available: true
+          available: true,
+          image: ''
         });
+        setImageFile(null);
+        setImagePreview('');
         fetchVehicles();
       } else {
         setMessage({ type: 'error', text: data.message });
@@ -125,8 +143,11 @@ export default function AdminVehicles() {
       price: vehicle.price,
       features: vehicle.features,
       description: vehicle.description,
-      available: vehicle.available
+      available: vehicle.available,
+      image: vehicle.image
     });
+    setImagePreview(vehicle.image || '');
+    setImageFile(null);
     setDialogOpen(true);
   };
 
@@ -161,6 +182,44 @@ export default function AdminVehicles() {
     setFormData({ ...formData, features });
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        setImagePreview(imageUrl);
+        setFormData({ ...formData, image: imageUrl });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (imageData: string): Promise<string> => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch('/api/admin/upload-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ imageData }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        return data.imageUrl;
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      return imageData; // Fallback to original data
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-6">
@@ -193,8 +252,11 @@ export default function AdminVehicles() {
                   price: 0,
                   features: [],
                   description: '',
-                  available: true
+                  available: true,
+                  image: ''
                 });
+                setImageFile(null);
+                setImagePreview('');
               }}
               className="flex items-center gap-2"
             >
@@ -292,6 +354,26 @@ export default function AdminVehicles() {
                   placeholder="Vehicle description..."
                   rows={3}
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="image">Vehicle Image</Label>
+                <Input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="cursor-pointer"
+                />
+                {imagePreview && (
+                  <div className="mt-2">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-32 h-24 object-cover rounded-lg border"
+                    />
+                  </div>
+                )}
               </div>
               
               <div className="flex items-center space-x-2">
