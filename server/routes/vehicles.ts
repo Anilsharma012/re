@@ -25,26 +25,34 @@ export interface VehicleResponse {
 // Get all vehicles
 export const getAllVehicles: RequestHandler = async (req, res) => {
   try {
-    console.log('🚗 Fetching vehicles...');
+    console.log('🚗 Fetching all vehicles...');
     const db = await getDatabase();
-    const vehicles = await db.collection('vehicles').find({}).toArray();
 
-    console.log(`✅ Retrieved ${vehicles.length} vehicles`);
+    const vehicles = await db.collection('vehicles').find({}).toArray();
+    console.log(`📊 Retrieved ${vehicles.length} vehicles from database`);
+
+    // Log the first few vehicle names for debugging
+    if (vehicles.length > 0) {
+      console.log('🚗 Sample vehicles:', vehicles.slice(0, 3).map(v => v.name));
+    } else {
+      console.log('⚠️ No vehicles found in database');
+    }
 
     const response: VehicleResponse = {
       success: true,
-      message: 'Vehicles retrieved successfully',
+      message: `Retrieved ${vehicles.length} vehicles from MongoDB Atlas`,
       vehicles: vehicles as Vehicle[]
     };
 
     res.json(response);
   } catch (error) {
     console.error('❌ Error fetching vehicles:', error.message);
+    console.error('❌ Full error:', error);
 
     // Return a proper error response instead of 500
     res.json({
       success: false,
-      message: 'Database temporarily unavailable. Please try again later.',
+      message: `Database error: ${error.message}`,
       vehicles: []
     });
   }
