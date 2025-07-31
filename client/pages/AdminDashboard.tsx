@@ -73,30 +73,35 @@ export default function AdminDashboard() {
 
   const quickTestSystem = async () => {
     try {
-      // Test adding a vehicle
-      const testResponse = await fetch('/api/debug/quick-test', {
-        method: 'POST'
-      });
-      const testData = await testResponse.json();
+      // Test MongoDB connection
+      const mongoResponse = await fetch('/api/debug/mongo-test');
+      const mongoData = await mongoResponse.json();
 
-      // Get storage status
-      const storageResponse = await fetch('/api/debug/storage');
-      const storageData = await storageResponse.json();
+      if (mongoData.success) {
+        alert(`🎉 MongoDB Atlas Test Successful!
 
-      if (testData.success && storageData.success) {
-        alert(`✅ System Test Successful!
+${mongoData.message}
 
-Vehicle Added: ${testData.vehicle.name}
-Storage Type: ${storageData.storage.type}
-Total Vehicles: ${storageData.storage.collections.vehicles}
+Database: ${mongoData.details.database}
+Operations: ${mongoData.details.operations}
 
-System is working properly!`);
+Collections:
+- Vehicles: ${mongoData.details.collections.vehicles}
+- Enquiries: ${mongoData.details.collections.enquiries}
+- Contacts: ${mongoData.details.collections.contacts}
+
+✅ All data is now saving to MongoDB Atlas only!`);
       } else {
-        alert('❌ System test failed. Check console for details.');
+        alert(`❌ MongoDB Atlas Test Failed!
+
+Error: ${mongoData.message}
+Details: ${mongoData.details}
+
+Please check your connection settings.`);
       }
     } catch (error) {
-      console.error('Quick test error:', error);
-      alert('❌ System test error. Check console for details.');
+      console.error('MongoDB test error:', error);
+      alert('❌ MongoDB test error. Check console for details.');
     }
   };
 
@@ -125,7 +130,7 @@ System is working properly!`);
           className="flex items-center gap-2"
         >
           <Activity className="w-4 h-4" />
-          Quick Test System
+          Test MongoDB Atlas
         </Button>
       </div>
 
