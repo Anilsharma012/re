@@ -19,7 +19,8 @@ import {
   Calendar,
   CheckCircle,
   XCircle,
-  Eye
+  Eye,
+  Activity
 } from 'lucide-react';
 
 interface Vehicle {
