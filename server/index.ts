@@ -17,6 +17,7 @@ import {
   deleteEnquiry
 } from "./routes/admin";
 import { seedTestData } from "./routes/testData";
+import { uploadVehicleImage, getUploadedImages } from "./routes/upload";
 import { getAllVehicles, getVehicle, createVehicle, updateVehicle, deleteVehicle } from "./routes/vehicles";
 
 export function createServer() {
@@ -54,6 +55,10 @@ export function createServer() {
   app.post("/api/admin/vehicles", verifyAdmin, createVehicle);
   app.put("/api/admin/vehicles/:id", verifyAdmin, updateVehicle);
   app.delete("/api/admin/vehicles/:id", verifyAdmin, deleteVehicle);
+
+  // Image upload routes
+  app.post("/api/admin/upload-image", verifyAdmin, uploadVehicleImage);
+  app.get("/api/admin/images", verifyAdmin, getUploadedImages);
 
   // Test data seeding (for demo purposes)
   app.post("/api/admin/seed-data", verifyAdmin, seedTestData);
