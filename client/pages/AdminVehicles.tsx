@@ -304,7 +304,7 @@ export default function AdminVehicles() {
       console.log('🔧 Testing API connection...');
       setMessage({ type: 'success', text: '⏳ Testing connection...' });
 
-      const response = await fetch('/api/health', {
+      const response = await fetch('/api/simple-ping', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
