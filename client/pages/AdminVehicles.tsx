@@ -381,7 +381,7 @@ export default function AdminVehicles() {
     const token = localStorage.getItem("adminToken");
 
     try {
-      console.log("🗑️ Deleting vehicle:", vehicleId);
+      console.log("���️ Deleting vehicle:", vehicleId);
 
       const response = await fetch(`/api/admin/vehicles/${vehicleId}`, {
         method: "DELETE",
@@ -883,6 +883,14 @@ Sample vehicles: ${data.storage.sampleVehicles.map((v) => v.name).join(", ")}`;
                     onClick={() => setDialogOpen(false)}
                   >
                     Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={retryLastSubmission}
+                    className="border-orange-600 text-orange-600 hover:bg-orange-50"
+                  >
+                    🔄 Retry
                   </Button>
                   <Button type="submit">
                     {editingVehicle ? "Update Vehicle" : "Add Vehicle"}
