@@ -21,6 +21,7 @@ import { seedVehicles } from "./routes/seedVehicles";
 import { getStorageStatus, seedTestVehicles } from "./routes/debug";
 import { quickTestVehicle, getAllVehiclesTest } from "./routes/quickTest";
 import { testMongoConnection } from "./routes/mongoTest";
+import { testDirectMongo } from "./routes/testDirectMongo";
 import { testAllAPIs } from "./routes/apiTest";
 import { healthCheck } from "./routes/health";
 import { uploadVehicleImage, getUploadedImages } from "./routes/upload";
