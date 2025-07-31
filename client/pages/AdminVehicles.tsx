@@ -153,9 +153,9 @@ export default function AdminVehicles() {
 
   const handleDelete = async (vehicleId: string) => {
     if (!confirm('Are you sure you want to delete this vehicle?')) return;
-    
+
     const token = localStorage.getItem('adminToken');
-    
+
     try {
       const response = await fetch(`/api/admin/vehicles/${vehicleId}`, {
         method: 'DELETE',
@@ -165,7 +165,7 @@ export default function AdminVehicles() {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         setMessage({ type: 'success', text: 'Vehicle deleted successfully' });
         fetchVehicles();
@@ -174,6 +174,32 @@ export default function AdminVehicles() {
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to delete vehicle' });
+    }
+  };
+
+  const seedVehicles = async () => {
+    if (!confirm('This will replace all existing vehicles with sample data. Continue?')) return;
+
+    const token = localStorage.getItem('adminToken');
+
+    try {
+      const response = await fetch('/api/admin/seed-vehicles', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage({ type: 'success', text: data.message });
+        fetchVehicles();
+      } else {
+        setMessage({ type: 'error', text: data.message });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to seed vehicles' });
     }
   };
 
@@ -240,9 +266,19 @@ export default function AdminVehicles() {
           <p className="text-gray-600">Manage your fleet of vehicles</p>
         </div>
         
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button 
+        <div className="flex gap-2">
+          <Button
+            onClick={seedVehicles}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Seed Sample Data
+          </Button>
+
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button 
               onClick={() => {
                 setEditingVehicle(null);
                 setFormData({
@@ -400,6 +436,7 @@ export default function AdminVehicles() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Messages */}
