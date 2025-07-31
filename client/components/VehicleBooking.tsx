@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Car,
@@ -11,7 +11,9 @@ import {
   Snowflake,
   Music,
   Coffee,
+  IndianRupee,
 } from "lucide-react";
+import { Vehicle } from "@shared/api";
 
 interface VehicleBookingProps {
   onGetQuoteClick: () => void;
@@ -21,16 +23,19 @@ export default function VehicleBooking({
   onGetQuoteClick,
 }: VehicleBookingProps) {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const vehicleCategories = [
     { id: "all", name: "All Vehicles", icon: Car },
-    { id: "sedan", name: "Sedan Cars", icon: Car },
-    { id: "suv", name: "SUVs", icon: Car },
-    { id: "tempo", name: "Tempo Travellers", icon: Users },
-    { id: "bus", name: "Mini Buses", icon: Users },
+    { id: "Sedan", name: "Sedan Cars", icon: Car },
+    { id: "SUV", name: "SUVs", icon: Car },
+    { id: "Tempo Traveller", name: "Tempo Travellers", icon: Users },
+    { id: "Bus", name: "Mini Buses", icon: Users },
   ];
 
-  const vehicles = [
+  // Fallback vehicles if database is empty
+  const fallbackVehicles = [
     {
       id: 1,
       name: "Maruti Suzuki Dzire",
@@ -156,13 +161,41 @@ export default function VehicleBooking({
       rating: 4.8,
       bookings: 178,
       description: "Perfect for large corporate groups and wedding parties",
+      dailyRate: "₹4,500",
+      perKmRate: "₹18",
     },
   ];
+
+  useEffect(() => {
+    fetchVehicles();
+  }, []);
+
+  const fetchVehicles = async () => {
+    try {
+      const response = await fetch('/api/vehicles');
+      const data = await response.json();
+      if (data.success && data.vehicles && data.vehicles.length > 0) {
+        setVehicles(data.vehicles);
+      } else {
+        // Use fallback vehicles if database is empty
+        setVehicles(fallbackVehicles as any);
+      }
+    } catch (error) {
+      console.error('Failed to fetch vehicles:', error);
+      // Use fallback vehicles on error
+      setVehicles(fallbackVehicles as any);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredVehicles =
     selectedCategory === "all"
       ? vehicles
-      : vehicles.filter((vehicle) => vehicle.category === selectedCategory);
+      : vehicles.filter((vehicle) =>
+          vehicle.type === selectedCategory ||
+          (vehicle as any).category === selectedCategory
+        );
 
   const getFeatureIcon = (feature: string) => {
     const iconMap: { [key: string]: any } = {
@@ -214,28 +247,37 @@ export default function VehicleBooking({
           })}
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading vehicles...</p>
+          </div>
+        )}
+
         {/* Vehicles Grid */}
+        {!loading && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
           {filteredVehicles.map((vehicle, index) => (
             <div
-              key={vehicle.id}
+              key={vehicle._id || (vehicle as any).id}
               className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               {/* Vehicle Image */}
               <div className="relative h-40 overflow-hidden">
                 <img
-                  src={vehicle.image}
+                  src={vehicle.image || (vehicle as any).image || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=300&fit=crop"}
                   alt={vehicle.name}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute top-3 left-3 bg-primary text-white px-2 py-1 rounded-full text-xs font-semibold">
-                  {vehicle.capacity} Seater
+                  {vehicle.capacity || (vehicle as any).capacity} Seater
                 </div>
                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center">
                   <Star className="h-3 w-3 text-travel-purple mr-1 fill-current" />
                   <span className="text-xs font-semibold">
-                    {vehicle.rating}
+                    {(vehicle as any).rating || "4.5"}
                   </span>
                 </div>
               </div>
@@ -247,23 +289,25 @@ export default function VehicleBooking({
                 </h3>
 
                 <p className="text-sm text-gray-600 mb-3">
-                  {vehicle.description}
+                  {vehicle.description || (vehicle as any).description}
                 </p>
 
                 {/* Vehicle Specs */}
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center text-xs text-gray-600">
-                    <Fuel className="h-3 w-3 mr-2" />
-                    <span>{vehicle.fuelType}</span>
-                  </div>
-                  <div className="flex items-center text-xs text-gray-600">
                     <Car className="h-3 w-3 mr-2" />
-                    <span>{vehicle.transmission}</span>
+                    <span>{vehicle.type || (vehicle as any).category}</span>
                   </div>
                   <div className="flex items-center text-xs text-gray-600">
                     <Users className="h-3 w-3 mr-2" />
-                    <span>{vehicle.bookings} bookings</span>
+                    <span>{vehicle.capacity || (vehicle as any).capacity} passengers</span>
                   </div>
+                  {(vehicle as any).fuelType && (
+                    <div className="flex items-center text-xs text-gray-600">
+                      <Fuel className="h-3 w-3 mr-2" />
+                      <span>{(vehicle as any).fuelType}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Features */}
@@ -291,13 +335,16 @@ export default function VehicleBooking({
 
                 {/* Pricing */}
                 <div className="mb-4">
-                  <div className="text-primary font-bold text-lg">
-                    {vehicle.dailyRate}
+                  <div className="text-primary font-bold text-lg flex items-center">
+                    <IndianRupee className="h-4 w-4" />
+                    {vehicle.price || (vehicle as any).dailyRate?.replace('₹', '') || "2500"}
                   </div>
                   <div className="text-xs text-gray-600">per day</div>
-                  <div className="text-sm text-gray-600">
-                    {vehicle.perKmRate}/km
-                  </div>
+                  {(vehicle as any).perKmRate && (
+                    <div className="text-sm text-gray-600">
+                      {(vehicle as any).perKmRate}/km
+                    </div>
+                  )}
                 </div>
 
                 {/* CTA Button */}
@@ -311,6 +358,7 @@ export default function VehicleBooking({
             </div>
           ))}
         </div>
+        )}
 
         {/* Booking Features */}
         <div className="grid md:grid-cols-4 gap-6 mb-12">
