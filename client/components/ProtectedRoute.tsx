@@ -13,31 +13,70 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     if (token) {
       console.log('🔒 Verifying admin token...');
 
-      // Verify token validity using dedicated endpoint
-      fetch('/api/admin/verify-token', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('🔒 Token verification response:', data);
-        if (data.success && data.authenticated) {
-          console.log('✅ Token valid, user authenticated as:', data.user?.username);
-          setIsAuthenticated(true);
-        } else {
-          console.log('❌ Token invalid, removing:', data.message);
-          localStorage.removeItem('adminToken');
-          setIsAuthenticated(false);
+      const verifyTokenWithFallback = async () => {
+        try {
+          // First try the dedicated token verification endpoint
+          const response = await fetch('/api/admin/verify-token', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+            timeout: 5000 // 5 second timeout
+          } as any);
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log('🔒 Token verification response:', data);
+
+          if (data.success && data.authenticated) {
+            console.log('✅ Token valid, user authenticated as:', data.user?.username);
+            setIsAuthenticated(true);
+          } else {
+            console.log('❌ Token invalid, removing:', data.message);
+            localStorage.removeItem('adminToken');
+            setIsAuthenticated(false);
+          }
+        } catch (error) {
+          console.error('❌ Primary token verification failed:', error.message);
+
+          // Fallback: Try admin health check
+          try {
+            console.log('🔄 Trying fallback verification...');
+            const healthResponse = await fetch('/api/admin/health');
+
+            if (healthResponse.ok) {
+              console.log('✅ Admin API is healthy, keeping user logged in');
+              setIsAuthenticated(true);
+            } else {
+              throw new Error('Health check failed');
+            }
+          } catch (fallbackError) {
+            console.error('❌ Fallback verification failed:', fallbackError.message);
+            // Last resort: check if token looks valid (not expired locally)
+            try {
+              const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+              const currentTime = Date.now() / 1000;
+
+              if (tokenPayload.exp && tokenPayload.exp > currentTime) {
+                console.log('⚠️ Server unreachable but token appears valid, keeping user logged in');
+                setIsAuthenticated(true);
+              } else {
+                console.log('❌ Token expired, logging out');
+                localStorage.removeItem('adminToken');
+                setIsAuthenticated(false);
+              }
+            } catch (parseError) {
+              console.log('❌ Could not parse token, logging out');
+              localStorage.removeItem('adminToken');
+              setIsAuthenticated(false);
+            }
+          }
         }
-      })
-      .catch(error => {
-        console.error('❌ Token verification failed:', error.message);
-        // If the API is down, don't automatically log out the user
-        // Instead, allow them to stay authenticated for better UX
-        console.log('⚠️ Network error during token verification, keeping user logged in');
-        setIsAuthenticated(true);
-      });
+      };
+
+      verifyTokenWithFallback();
     } else {
       console.log('❌ No admin token found');
       setIsAuthenticated(false);
