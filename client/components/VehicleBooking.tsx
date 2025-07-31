@@ -129,7 +129,7 @@ export default function VehicleBooking({
               <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
                 {filteredVehicles.map((vehicle, index) => (
                   <div
-                    key={vehicle._id}
+                    key={vehicle._id ? `${vehicle._id}-${index}` : `vehicle-${index}`}
                     className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
