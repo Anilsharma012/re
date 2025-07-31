@@ -6,6 +6,7 @@ import { handleEnquiry } from "./routes/enquiry";
 import { handleContact } from "./routes/contact";
 import { handleTestEmail } from "./routes/testEmail";
 import { adminLogin, verifyAdmin, getAdminStats } from "./routes/admin";
+import { getAllVehicles, getVehicle, createVehicle, updateVehicle, deleteVehicle } from "./routes/vehicles";
 
 export function createServer() {
   const app = express();
@@ -29,6 +30,13 @@ export function createServer() {
   // Admin routes
   app.post("/api/admin/login", adminLogin);
   app.get("/api/admin/stats", verifyAdmin, getAdminStats);
+
+  // Vehicle routes
+  app.get("/api/vehicles", getAllVehicles);
+  app.get("/api/vehicles/:id", getVehicle);
+  app.post("/api/admin/vehicles", verifyAdmin, createVehicle);
+  app.put("/api/admin/vehicles/:id", verifyAdmin, updateVehicle);
+  app.delete("/api/admin/vehicles/:id", verifyAdmin, deleteVehicle);
 
   return app;
 }
