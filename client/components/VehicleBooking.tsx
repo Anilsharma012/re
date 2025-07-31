@@ -34,156 +34,26 @@ export default function VehicleBooking({
     { id: "Bus", name: "Mini Buses", icon: Users },
   ];
 
-  // Fallback vehicles if database is empty
-  const fallbackVehicles = [
-    {
-      id: 1,
-      name: "Maruti Suzuki Dzire",
-      category: "sedan",
-      image:
-        "./image/maruti.webp",
-      capacity: "4+1",
-      fuelType: "Petrol/CNG",
-      transmission: "Manual/Auto",
-
-      features: ["AC", "Music System", "GPS", "First Aid"],
-      rating: 4.5,
-      bookings: 234,
-      description: "Perfect for small family trips and city tours",
-    },
-    {
-      id: 2,
-      name: "Hyundai Verna",
-      category: "sedan",
-      image:
-        "./image/v.jpg",
-      capacity: "4+1",
-      fuelType: "Petrol/Diesel",
-      transmission: "Manual/Auto",
-
-      features: ["AC", "Premium Interior", "GPS", "Bluetooth"],
-      rating: 4.7,
-      bookings: 189,
-      description: "Luxury sedan for comfortable long-distance travel",
-    },
-    {
-      id: 3,
-      name: "Toyota Innova Crysta",
-      category: "suv",
-      image:
-        "./image/c.avif",
-      capacity: "7+1",
-      fuelType: "Diesel",
-      transmission: "Manual/Auto",
-
-      features: ["AC", "Captain Seats", "GPS", "Entertainment", "Large Boot"],
-      rating: 4.8,
-      bookings: 456,
-      description: "Most popular choice for family and group travel",
-    },
-    {
-      id: 4,
-      name: "Mahindra Scorpio",
-      category: "suv",
-      image:
-        "./image/s.jpg",
-      capacity: "7+1",
-      fuelType: "Diesel",
-      transmission: "Manual",
-
-      features: ["AC", "4WD", "GPS", "Robust Build"],
-      rating: 4.6,
-      bookings: 298,
-      description: "Ideal for rough terrains and adventure trips",
-    },
-    {
-      id: 5,
-      name: "Force Urbania (Tempo Traveller)",
-      category: "tempo",
-      image:
-        "./image/t.jpg",
-      capacity: "12+1",
-      fuelType: "Diesel",
-      transmission: "Manual",
-
-      features: [
-        "AC",
-        "Reclining Seats",
-        "GPS",
-        "Entertainment",
-        "Luggage Space",
-      ],
-      rating: 4.9,
-      bookings: 567,
-      description: "Perfect for group tours and pilgrimages",
-    },
-    {
-      id: 6,
-      name: "Tempo Traveller 17 Seater",
-      category: "tempo",
-      image:
-        "./image/tt.jpg",
-      capacity: "17+1",
-      fuelType: "Diesel",
-      transmission: "Manual",
-
-      features: ["AC", "Comfortable Seats", "GPS", "Music System", "Ice Box"],
-      rating: 4.8,
-      bookings: 423,
-      description: "Ideal for medium-sized groups and corporate trips",
-    },
-    {
-      id: 7,
-      name: "Mini Bus 25 Seater",
-      category: "bus",
-      image:
-        "./image/mm.jpeg",
-      capacity: "25+1",
-      fuelType: "Diesel",
-      transmission: "Manual",
-
-      features: ["AC", "Spacious", "GPS", "Entertainment", "Large Luggage"],
-      rating: 4.7,
-      bookings: 234,
-      description: "Great for large groups and events",
-    },
-    {
-      id: 8,
-      name: "Mini Bus 32 Seater",
-      category: "bus",
-      image:
-        "./image/mmm.jpg",
-      capacity: "32+1",
-      fuelType: "Diesel",
-      transmission: "Manual",
-
-      features: ["AC", "Premium Seats", "GPS", "Entertainment", "Washroom"],
-      rating: 4.8,
-      bookings: 178,
-      description: "Perfect for large corporate groups and wedding parties",
-      dailyRate: "₹4,500",
-      perKmRate: "₹18",
-    },
-  ];
-
   useEffect(() => {
     fetchVehicles();
   }, []);
 
   const fetchVehicles = async () => {
     try {
+      console.log('Fetching vehicles from MongoDB Atlas...');
       const response = await fetch('/api/vehicles');
       const data = await response.json();
-      if (data.success && data.vehicles && data.vehicles.length > 0) {
+      
+      if (data.success && data.vehicles) {
+        console.log(`✅ Loaded ${data.vehicles.length} vehicles from MongoDB`);
         setVehicles(data.vehicles);
       } else {
-        // Use fallback vehicles if database is empty
-        setVehicles(fallbackVehicles as any);
+        console.error('❌ No vehicles data received from MongoDB');
+        setVehicles([]);
       }
     } catch (error) {
-      console.error('Failed to fetch vehicles:', error);
-      // Use fallback vehicles on error
-      setVehicles(fallbackVehicles as any);
+      console.error('❌ Failed to fetch vehicles from MongoDB:', error);
+      setVehicles([]);
     } finally {
       setLoading(false);
     }
@@ -192,10 +62,7 @@ export default function VehicleBooking({
   const filteredVehicles =
     selectedCategory === "all"
       ? vehicles
-      : vehicles.filter((vehicle) =>
-          vehicle.type === selectedCategory ||
-          (vehicle as any).category === selectedCategory
-        );
+      : vehicles.filter((vehicle) => vehicle.type === selectedCategory);
 
   const getFeatureIcon = (feature: string) => {
     const iconMap: { [key: string]: any } = {
@@ -251,113 +118,112 @@ export default function VehicleBooking({
         {loading && (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading vehicles...</p>
+            <p className="mt-4 text-gray-600">Loading vehicles from MongoDB Atlas...</p>
           </div>
         )}
 
         {/* Vehicles Grid */}
         {!loading && (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
-          {filteredVehicles.map((vehicle, index) => (
-            <div
-              key={vehicle._id || (vehicle as any).id}
-              className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              {/* Vehicle Image */}
-              <div className="relative h-40 overflow-hidden">
-                <img
-                  src={vehicle.image || (vehicle as any).image || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=300&fit=crop"}
-                  alt={vehicle.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute top-3 left-3 bg-primary text-white px-2 py-1 rounded-full text-xs font-semibold">
-                  {vehicle.capacity || (vehicle as any).capacity} Seater
-                </div>
-                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center">
-                  <Star className="h-3 w-3 text-travel-purple mr-1 fill-current" />
-                  <span className="text-xs font-semibold">
-                    {(vehicle as any).rating || "4.5"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Vehicle Details */}
-              <div className="p-4">
-                <h3 className="text-lg font-bold text-travel-navy mb-2 group-hover:text-primary transition-colors">
-                  {vehicle.name}
-                </h3>
-
-                <p className="text-sm text-gray-600 mb-3">
-                  {vehicle.description || (vehicle as any).description}
-                </p>
-
-                {/* Vehicle Specs */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-xs text-gray-600">
-                    <Car className="h-3 w-3 mr-2" />
-                    <span>{vehicle.type || (vehicle as any).category}</span>
-                  </div>
-                  <div className="flex items-center text-xs text-gray-600">
-                    <Users className="h-3 w-3 mr-2" />
-                    <span>{vehicle.capacity || (vehicle as any).capacity} passengers</span>
-                  </div>
-                  {(vehicle as any).fuelType && (
-                    <div className="flex items-center text-xs text-gray-600">
-                      <Fuel className="h-3 w-3 mr-2" />
-                      <span>{(vehicle as any).fuelType}</span>
+          <>
+            {filteredVehicles.length > 0 ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
+                {filteredVehicles.map((vehicle, index) => (
+                  <div
+                    key={vehicle._id}
+                    className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    {/* Vehicle Image */}
+                    <div className="relative h-40 overflow-hidden">
+                      <img
+                        src={vehicle.image || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=300&fit=crop"}
+                        alt={vehicle.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                      <div className="absolute top-3 left-3 bg-primary text-white px-2 py-1 rounded-full text-xs font-semibold">
+                        {vehicle.capacity} Seater
+                      </div>
+                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center">
+                        <Star className="h-3 w-3 text-travel-purple mr-1 fill-current" />
+                        <span className="text-xs font-semibold">4.5</span>
+                      </div>
                     </div>
-                  )}
-                </div>
 
-                {/* Features */}
-                <div className="mb-4">
-                  <div className="flex flex-wrap gap-1">
-                    {vehicle.features.slice(0, 3).map((feature, idx) => {
-                      const FeatureIcon = getFeatureIcon(feature);
-                      return (
-                        <div
-                          key={idx}
-                          className="flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
-                        >
-                          <FeatureIcon className="h-3 w-3 mr-1" />
-                          <span>{feature}</span>
+                    {/* Vehicle Details */}
+                    <div className="p-4">
+                      <h3 className="text-lg font-bold text-travel-navy mb-2 group-hover:text-primary transition-colors">
+                        {vehicle.name}
+                      </h3>
+
+                      <p className="text-sm text-gray-600 mb-3">
+                        {vehicle.description}
+                      </p>
+
+                      {/* Vehicle Specs */}
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center text-xs text-gray-600">
+                          <Car className="h-3 w-3 mr-2" />
+                          <span>{vehicle.type}</span>
                         </div>
-                      );
-                    })}
-                    {vehicle.features.length > 3 && (
-                      <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs">
-                        +{vehicle.features.length - 3}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                        <div className="flex items-center text-xs text-gray-600">
+                          <Users className="h-3 w-3 mr-2" />
+                          <span>{vehicle.capacity} passengers</span>
+                        </div>
+                      </div>
 
-                {/* Pricing */}
-                <div className="mb-4">
-                  <div className="text-primary font-bold text-lg flex items-center">
-                    <IndianRupee className="h-4 w-4" />
-                    {vehicle.price || (vehicle as any).dailyRate?.replace('₹', '') || "2500"}
-                  </div>
-                  <div className="text-xs text-gray-600">per day</div>
-                  {(vehicle as any).perKmRate && (
-                    <div className="text-sm text-gray-600">
-                      {(vehicle as any).perKmRate}/km
+                      {/* Features */}
+                      <div className="mb-4">
+                        <div className="flex flex-wrap gap-1">
+                          {vehicle.features?.slice(0, 3).map((feature, idx) => {
+                            const FeatureIcon = getFeatureIcon(feature);
+                            return (
+                              <div
+                                key={idx}
+                                className="flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
+                              >
+                                <FeatureIcon className="h-3 w-3 mr-1" />
+                                <span>{feature}</span>
+                              </div>
+                            );
+                          })}
+                          {vehicle.features && vehicle.features.length > 3 && (
+                            <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs">
+                              +{vehicle.features.length - 3}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Pricing */}
+                      <div className="mb-4">
+                        <div className="text-primary font-bold text-lg flex items-center">
+                          <IndianRupee className="h-4 w-4" />
+                          {vehicle.price}
+                        </div>
+                        <div className="text-xs text-gray-600">per day</div>
+                      </div>
+
+                      {/* CTA Button */}
+                      <Button
+                        onClick={onGetQuoteClick}
+                        className="w-full bg-primary hover:bg-primary/90 text-white transform transition-all duration-300 hover:scale-[1.02]"
+                      >
+                        Book Now
+                      </Button>
                     </div>
-                  )}
-                </div>
-
-                {/* CTA Button */}
-                <Button
-                  onClick={onGetQuoteClick}
-                  className="w-full bg-primary hover:bg-primary/90 text-white transform transition-all duration-300 hover:scale-[1.02]"
-                >
-                  Book Now
-                </Button>
+                  </div>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
+            ) : (
+              <div className="text-center py-12">
+                <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No Vehicles Available</h3>
+                <p className="text-gray-600 mb-4">
+                  No vehicles found in the database. Please add vehicles through the admin panel.
+                </p>
+              </div>
+            )}
+          </>
         )}
 
         {/* Booking Features */}
