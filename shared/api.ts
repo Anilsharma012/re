@@ -46,3 +46,52 @@ export interface ContactResponse {
   success: boolean;
   message: string;
 }
+
+/**
+ * Types for admin authentication and dashboard
+ */
+export interface AdminLoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface AdminLoginResponse {
+  success: boolean;
+  token?: string;
+  message: string;
+}
+
+export interface AdminStatsResponse {
+  totalVisitors: number;
+  totalEnquiries: number;
+  totalContacts: number;
+  recentActivity: Array<{
+    type: string;
+    message: string;
+    timestamp: Date;
+  }>;
+}
+
+/**
+ * Types for vehicle management
+ */
+export interface Vehicle {
+  _id?: string;
+  name: string;
+  type: string;
+  capacity: number;
+  price: number;
+  features: string[];
+  image?: string;
+  description?: string;
+  available: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface VehicleResponse {
+  success: boolean;
+  message: string;
+  vehicle?: Vehicle;
+  vehicles?: Vehicle[];
+}
